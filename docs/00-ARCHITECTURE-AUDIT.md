@@ -2334,3 +2334,94 @@ deliberada de la especificación, que encabezaba con el oro.
   (`attunement.overLimit`).
 - **La inspiración heroica es solo de 2024.** En 2014 el panel no se pinta:
   la inspiración de 2014 es otra regla y mezclarlas sería inventar.
+
+---
+
+# ADENDA XI · LA AUDITORÍA CON LECTOR DE PANTALLA, Y LO QUE ENCONTRÓ (T14)
+
+`docs/02-AUDITORIA-LECTOR-DE-PANTALLA.md` decía, con razón, que una máquina no
+puede juzgar si lo que se ESCUCHA tiene sentido. De ahí se había sacado una
+conclusión más ancha de la cuenta: que la auditoría entera había que esperarla.
+
+Buena parte de sus seis pruebas no es cuestión de criterio. Es si la
+información llega al **árbol de accesibilidad**, que es literalmente lo que un
+lector de pantalla consume. Eso se recorrió, y salieron **seis fallos**.
+
+## D-79 · axe-core comprueba que haya nombre, no que el nombre sirva
+
+Cero infracciones de WCAG AA en seis pantallas y dos temas, y aun así:
+
+| Dónde | Qué pasaba | Por qué axe no lo ve |
+| --- | --- | --- |
+| Creador, cada paso | El paso cambiaba en silencio | Los párrafos existen y tienen texto |
+| Creador, «Siguiente» bloqueado | `disabled` nativo lo saca del recorrido por tabulador | Un botón deshabilitado es válido |
+| Biblioteca | El contador de resultados cambiaba sin anunciarse | Es un párrafo correcto |
+| Avisos | Dos «Deshacer» apilados, con el mismo nombre | Los dos TIENEN nombre |
+| Ficha, al abrirla | Cantaba los PG sin que nadie lo pidiera | La región viva está bien formada |
+| Ficha, cerrar un diálogo | El foco acababa en `<body>` | No es un problema de marcado |
+
+Los cuatro primeros son información que existe en pantalla y **no llega**. Los
+dos últimos son peores, y de eso va el resto de la adenda.
+
+## D-80 · Dos arreglos que estaban escritos y no funcionaban
+
+Es el hallazgo que justifica haber medido en vez de leer.
+
+**El anuncio de los puntos de golpe.** El comentario del panel decía que la
+región viva «empieza vacía a propósito», y explicaba por qué: cantarlos al
+abrir la ficha sería hablar sin que nadie pregunte. La intención era correcta.
+El código no la cumplía: vigilaba el valor MOSTRADO, que sale de
+`Math.min(guardado, máximo)`, y el máximo se mueve solo mientras la ficha se
+hidrata. Entrar a cualquier personaje disparaba el anuncio. Y la región es
+`assertive`, así que ni esperaba turno: **cortaba lo que el lector estuviera
+diciendo**.
+
+Ahora se vigila `sheet.state.hitPoints.current`, el valor guardado, que no se
+mueve solo: solo cambia cuando un comando lo cambia, que es exactamente cuando
+hay algo que anunciar.
+
+**La devolución del foco.** `Sheet` tiene treinta líneas de comentario
+explicando que Radix no puede devolver el foco sin un `Dialog.Trigger`, que sin
+eso termina en `<body>`, y que por eso se recuerda a mano quién lo tenía. El
+diagnóstico es exacto. La implementación guardaba `document.activeElement`
+dentro de `onOpenAutoFocus`.
+
+Y aquí está lo interesante: **funcionaba en Homebrew y no en la ficha**. Hay un
+test en `keyboard.spec.ts` que comprueba la devolución del foco, pasa, y cubre
+el diálogo de Homebrew. El de puntos de golpe, con el mismo componente, dejaba
+el foco en el cuerpo del documento.
+
+No se persiguió por qué una pantalla sí y la otra no. Depender de cuándo llega
+un evento y de qué tiene el foco en ese instante es frágil por construcción, y
+el problema no lo necesita: ahora un registro de módulo anota el último
+elemento enfocado **fuera** de cualquier diálogo, y al cerrar se lo devuelve en
+el cuadro siguiente. No depende del evento de apertura, y sirve también para
+las hojas que se montan a la vez que se abren.
+
+### La lección, que es sobre documentación
+
+La tabla de «lo que ya está comprobado por máquina» tenía una fila que decía
+«foco devuelto al cerrar». Era verdad **a medias**: el test existía y pasaba,
+sobre una pantalla. Una fila que dice «comprobado» significa que hay un test,
+no que cubra todo. La tabla ahora dice qué cubre cada uno.
+
+## D-81 · Un botón bloqueado tiene que poder decir por qué
+
+`disabled` nativo saca el botón del recorrido por tabulador. Quien no ve la
+pantalla llega al final del paso, **no encuentra «Siguiente» por ningún lado** y
+no tiene manera de saber que existe ni por qué no avanza. El motivo estaba
+escrito —«Elegí una especie»— en un párrafo que nadie le llevaba.
+
+Ahora es `aria-disabled` con `aria-describedby` al motivo, el motivo es una
+región viva, y el clic se corta en el manejador: `aria-disabled` es una promesa
+al lector de pantalla, no un candado del navegador.
+
+## Lo que sigue sin hacerse
+
+Lo que no se automatiza: **si se entiende**. Si las frases se escuchan bien, si
+el ritmo de las interrupciones molesta, si el recorrido resulta cómodo. Eso
+está en `docs/02-AUDITORIA-LECTOR-DE-PANTALLA.md`, son veinte minutos, y hay que
+hacerlo con la pantalla apagada.
+
+Lo mecánico ya no se repite a mano: `tests/e2e/lector-de-pantalla.spec.ts`, 18
+casos sobre las seis pruebas, en móvil y escritorio.

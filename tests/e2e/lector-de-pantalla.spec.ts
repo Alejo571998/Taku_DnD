@@ -223,29 +223,43 @@ async function crearPersonaje(page: Page) {
   await page.goto('/characters/new');
   const next = page.getByRole('button', { name: 'Siguiente' });
 
+  /*
+    Se espera a que el paso esté completo ANTES de pulsar.
+
+    Hace falta desde que «Siguiente» pasó a `aria-disabled`: Playwright lo
+    respeta igual que a `disabled`, así que pulsar a ciegas se queda esperando
+    los 180 segundos del test si el contenido de ese paso todavía no cargó.
+    Antes el fallo era el mismo pero salía menos, que es lo peor que puede
+    hacer un test.
+  */
+  const avanzar = async () => {
+    await expect(next).toBeEnabled({ timeout: 60_000 });
+    await next.click();
+  };
+
   await page.getByRole('button', { name: /D&D \(2024\)/ }).click();
-  await next.click();
+  await avanzar();
 
   await page.getByLabel('Nombre del personaje').fill('Vela de Prueba');
-  await next.click();
+  await avanzar();
 
   await page.getByRole('button', { name: /^Enano/ }).first().click();
-  await next.click();
+  await avanzar();
 
   await page.getByRole('button', { name: /^Guerrero/ }).click();
-  await next.click();
+  await avanzar();
 
   await page.getByRole('button', { name: /^Acólito/ }).click();
-  await next.click();
+  await avanzar();
 
   await page.getByRole('button', { name: 'Estándar' }).click();
-  await next.click();
+  await avanzar();
 
   await page.getByRole('button', { name: 'Atletismo' }).click();
   await page.getByRole('button', { name: 'Percepción' }).click();
-  await next.click();
+  await avanzar();
 
-  for (let i = 0; i < 4; i += 1) await next.click();
+  for (let i = 0; i < 4; i += 1) await avanzar();
 
   await page.getByRole('button', { name: 'Crear personaje' }).click();
   await page.waitForURL(/\/characters\/.+\/play/, { timeout: 90_000 });

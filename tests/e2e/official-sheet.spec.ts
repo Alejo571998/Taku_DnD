@@ -17,30 +17,40 @@ async function crear2024(page: Page) {
   await page.goto('/characters/new');
   const next = page.getByRole('button', { name: 'Siguiente' });
 
+  /*
+    Se espera a que el paso esté completo antes de pulsar. Pulsar a ciegas
+    funcionaba casi siempre y fallaba de vez en cuando —si el contenido del
+    paso no había cargado—, que es la peor forma de fallar: parece ruido.
+  */
+  const avanzar = async () => {
+    await expect(next).toBeEnabled({ timeout: 60_000 });
+    await next.click();
+  };
+
   await page.getByRole('button', { name: /D&D \(2024\)/ }).click();
-  await next.click();
+  await avanzar();
 
   await page.getByLabel('Nombre del personaje').fill('Vela de Prueba');
-  await next.click();
+  await avanzar();
 
   await page.getByRole('button', { name: /^Enano/ }).first().click();
-  await next.click();
+  await avanzar();
 
   await page.getByRole('button', { name: /^Guerrero/ }).click();
-  await next.click();
+  await avanzar();
 
   await page.getByRole('button', { name: /^Acólito/ }).click();
-  await next.click();
+  await avanzar();
 
   await page.getByRole('button', { name: 'Estándar' }).click();
-  await next.click();
+  await avanzar();
 
   await page.getByRole('button', { name: 'Atletismo' }).click();
   await page.getByRole('button', { name: 'Percepción' }).click();
-  await next.click();
+  await avanzar();
 
   // Los pasos restantes no tienen elecciones obligatorias.
-  for (let i = 0; i < 4; i += 1) await next.click();
+  for (let i = 0; i < 4; i += 1) await avanzar();
 
   await page.getByRole('button', { name: 'Crear personaje' }).click();
   await page.waitForURL(/\/characters\/.+\/play/, { timeout: 90_000 });

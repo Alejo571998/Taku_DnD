@@ -25,7 +25,7 @@ tiene tests y no rompe lo anterior.
 ```
 npm run verify      → typecheck ✓ · lint ✓ (0 errores) · 301 tests ✓ · 48 casos de BD ✓
 npm run build       → 27 rutas + middleware, compila ✓
-npx playwright test → 118 tests E2E ✓ (59 móvil + 59 escritorio) — contra el BUILD, ver abajo
+npx playwright test → 138 tests E2E ✓ (69 móvil + 69 escritorio) — contra el BUILD, ver abajo
 npm run test:db     → Postgres en proceso (rápido, sin red)
 npm run test:db:remote → los mismos 48 casos contra la instancia real
 npm run db:migrate  → aplica las migraciones que falten, con registro y checksum
@@ -34,7 +34,7 @@ npm run db:migrate  → aplica las migraciones que falten, con registro y checks
 Los E2E se corren contra el BUILD, no contra `next dev`. No es solo por los
 tests de rendimiento —medir `next dev` no significa nada—: contra el servidor de
 desarrollo la suite entera es inestable, porque cada primera visita a una ruta
-dispara una compilación y 118 tests en dos proyectos compiten por un solo
+dispara una compilación y 138 tests en dos proyectos compiten por un solo
 servidor. Tres corridas dieron tres conjuntos de fallos distintos, todos
 timeouts. Contra el build: 112 de 112 en 9,6 minutos (ver ADENDA VI · D-71).
 
@@ -368,7 +368,7 @@ E2E en `content-and-campaigns.spec.ts` (11).
 - [x] **Presupuesto de rendimiento definido y medido** contra el build de producción, con
       CPU a un cuarto y 4G flojo: LCP 908 ms, CLS 0,000, JS 324 KB, búsqueda 951 ms
 - [ ] Contra una instancia de Supabase **desplegada**: falta la capa PostgREST/GoTrue (T8)
-- [ ] Auditoría con lector de pantalla real (T14)
+- [x] Auditoría con lector de pantalla: la parte mecánica, con 6 fallos arreglados (T14). Falta escucharla
 - [ ] Medición en un teléfono físico: lo de arriba es una simulación reproducible, no un aparato
 
 ---
@@ -453,8 +453,9 @@ como «no la tiene» cuando falta.
 | T11 | ~~Homebrew no cubre clases ni especies completas~~ | Resuelto del todo: dotes, trasfondos, especies con sus rasgos, clases con progresión 1–20, **subclases con sus rasgos por nivel** y **equipo inicial** —fijo y a elegir— en clase y trasfondo. Lo de las subclases no era un formulario que faltaba: sin ellas, una clase propia se quedaba con el aviso de «subclase pendiente» para siempre | — |
 | T12 | ~~El tema claro es el más débil de los dos~~ | Sin defecto medible: pasa contraste AA y axe en las seis pantallas, auditado por separado | — |
 | T13 | ~~Carrera del cursor entre transacciones concurrentes~~ | Resuelto por reconciliación: al arrancar y al sincronizar a mano se compara el inventario del servidor contra lo local y se cura lo que el cursor haya perdido. No evita la carrera; la hace inofensiva | — |
-| T14 | Auditoría con lector de pantalla real | Lo automatizable está hecho —orden del foco, foco atrapado y devuelto, anuncios de los cambios— y encontró dos defectos reales. Si se ENTIENDE escuchándola necesita una persona: guion en `docs/02-AUDITORIA-LECTOR-DE-PANTALLA.md` | 20 min de alguien |
+| T14 | Auditoría con lector de pantalla real | Las seis pruebas del guion se recorrieron por el **árbol de accesibilidad**, que es lo que un lector consume, y salieron **seis fallos**, todos arreglados: el paso del creador y el contador de la biblioteca cambiaban en silencio; «Siguiente» bloqueado salía del recorrido por tabulador con el motivo escrito y sin quien lo llevara; dos avisos apilados daban dos «Deshacer» idénticos; la ficha cantaba los PG al abrirse **cortando** al lector, porque la región es `assertive`; y cerrar un diálogo dejaba el foco en `<body>`. Los dos últimos tenían el arreglo escrito en el código y **no funcionaba** —el del foco incluso pasaba su test, sobre otra pantalla—. Fijado en `tests/e2e/lector-de-pantalla.spec.ts` (18 casos). Detalle en ADENDA XI · D-79 a D-81. Queda lo único que no se automatiza: si se ENTIENDE escuchándola | 20 min de alguien |
 | T15 | ~~Tareas largas al arrancar sin comprobar~~ | Resuelto: el número se imprimía y no se afirmaba, así que el día que se duplicó nadie se enteró. Ahora falla | — |
+| T20 | **Borrar contenido propio no es atómico** | Borrar una clase casera son varias escrituras seguidas —cada subclase, cada rasgo, y la clase al final— hechas uno a uno desde la interfaz. Navegar a otra pantalla en ese instante las abandona a mitad y deja subclases huérfanas en la biblioteca. Medido: sin esperar al aviso, la subclase seguía apareciendo **una de cada tres veces**. El orden ayuda —la clase se borra la ÚLTIMA, así que una interrupción deja el padre y se puede reintentar—, pero la ventana existe. El arreglo es una transacción: un `removeMany` en el repositorio y el servicio, con cuidado de que la sincronización siga emitiendo su lápida por cada id | Antes de que alguien pierda contenido |
 | T16 | **El banco de rendimiento no sirve como semáforo en esta máquina** | La misma medición, sin cambiar código, dio 1.241 · 2.181 · 3.394 · 4.315 · 5.138 ms de reloj de pared, y 120 · 267 · 352 · 479 ms en la tarea más larga. Una varianza de 3-4x no detecta una regresión del 20%. El tope de la tarea más larga estaba en 400, DENTRO de ese rango, y falló una tanda entera por azar: subido a 900. Los topes quedaron donde atrapan una catástrofe y nada más; la señal real es el desglose que el test imprime, comparado contra una máquina en reposo | Medir en CI dedicado |
 
 ---
@@ -464,10 +465,10 @@ como «no la tiene» cuando falta.
 | | |
 |---|---|
 | Archivos TypeScript | 129 |
-| Líneas en `src/` | 27.032 |
-| Archivos de test | 23 (15 unitarios + 8 E2E) |
+| Líneas en `src/` | 27.225 |
+| Archivos de test | 24 (15 unitarios + 9 E2E) |
 | Tests unitarios + integración | **301** |
-| Tests E2E | **118** (59 móvil + 59 escritorio) |
+| Tests E2E | **138** (69 móvil + 69 escritorio) |
 | Definiciones de contenido | 3.039 |
 | Traducción de contenido | 2.241 nombres + **2.127 textos** — el 100% del SRD, prosa, bloques de estadísticas y materiales incluidos—, 261.455 palabras |
 | Claves de interfaz | 141, en paridad es-419 / en |

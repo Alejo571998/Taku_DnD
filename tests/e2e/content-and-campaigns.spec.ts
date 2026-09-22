@@ -232,7 +232,12 @@ test.describe('Homebrew grande', () => {
     await page.goto('/library');
     await waitForContent(page);
     await page.getByLabel('Buscar en la biblioteca').fill('Vigilia');
-    await expect(page.getByText('Sin resultados').or(page.getByText(/0 resultados/))).toBeVisible();
+    /*
+      Por la región viva, que es la que un lector de pantalla oye. El selector
+      anterior buscaba el texto suelto con `/0 resultados/`, que casaba también
+      con «60 resultados»: pasaba por casualidad mientras hubo un solo nodo.
+    */
+    await expect(page.locator('main p[role="status"]')).toHaveText(/^Sin resultados para /);
   });
 });
 
@@ -350,12 +355,32 @@ test.describe('Subclases caseras', () => {
     await page.getByRole('button', { name: 'Borrar Vigía' }).click();
     await page.getByRole('button', { name: 'Borrar', exact: true }).click();
 
+    /*
+      Se espera el aviso ANTES de irse.
+
+      Borrar una clase son varias escrituras seguidas —cada subclase, cada
+      rasgo, y la clase al final— y navegar a mitad las abandona: la subclase
+      seguía apareciendo en la biblioteca una de cada tres veces. El aviso es
+      la señal de que terminaron todas.
+    */
+    await expect(page.getByText('Vigía borrado')).toBeVisible();
+
     await page.goto('/library');
     await waitForContent(page);
     await page.getByLabel('Buscar en la biblioteca').fill('Senda del Ojo');
-    await expect(
-      page.getByText('Sin resultados').or(page.getByText(/0 resultados/)),
-    ).toBeVisible();
+
+    /*
+      Lo que importa es que la subclase NO esté, no que no haya resultados:
+      «Senda» sola encuentra cuatro cosas del SRD, así que exigir cero sería
+      exigir algo que no depende de este borrado.
+
+      El selector anterior buscaba el texto suelto con `/0 resultados/`, que
+      casaba con «60 resultados» —el recuento del listado, antes de que la
+      búsqueda amortiguada se resolviera—. Pasaba sin llegar a mirar nunca.
+    */
+    await expect(page.locator('main p[role="status"]')).toHaveText(/resultados?$|^Sin resultados/);
+    await expect(page.getByRole('button', { name: /Senda del Ojo/ })).toHaveCount(0);
+    await expect(page.getByRole('button', { name: /Ojo Abierto/ })).toHaveCount(0);
   });
 });
 test.describe('Campañas', () => {

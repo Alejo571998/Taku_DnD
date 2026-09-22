@@ -107,12 +107,14 @@ desincronía.
   corre contra una instancia real de Supabase son los 48 casos del contrato del
   servidor —aislamiento entre inquilinos, idempotencia, concurrencia optimista y
   cursor— con `npm run test:db:remote`.
-- Nadie ha usado la aplicación con un **lector de pantalla** real. axe-core no
-  encuentra ni una infracción de WCAG AA en las seis pantallas y en los dos temas,
-  pero eso mide la estructura, no si se entiende escuchándola. Y hay algo
-  concreto que ya se sabe: los títulos de los paneles del modo Juego son
-  `span`, no encabezados, así que la pantalla no se puede recorrer saltando de
-  título en título.
+- Nadie ha usado la aplicación con un **lector de pantalla** real todavía. Lo
+  que sí se hizo es recorrer las seis pruebas del guion por el árbol de
+  accesibilidad, que es lo que un lector consume: salieron seis fallos y están
+  arreglados —entre ellos, la ficha cantaba los puntos de golpe al abrirse
+  cortando al lector, y cerrar un diálogo dejaba el foco en `<body>`—. Eso
+  quedó como test. Falta lo que no se automatiza: **si se entiende
+  escuchándola**. Son veinte minutos con `docs/02-AUDITORIA-LECTOR-DE-PANTALLA.md`
+  y la pantalla apagada.
 - La ficha sigue **la hoja oficial de 2024**, no la de 2014. El bloque de
   inspiración heroica solo se pinta con reglas de 2024, porque la inspiración
   de 2014 es otra regla; mezclarlas sería inventar una tercera.

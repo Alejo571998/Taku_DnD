@@ -4,6 +4,40 @@
 
 ---
 
+## Estado: la mitad mecánica ya se hizo (22/09/2026)
+
+Las seis pruebas de abajo se recorrieron leyendo el **árbol de accesibilidad**,
+que es literalmente lo que un lector de pantalla consume: roles, nombres,
+estados y regiones vivas. Salieron **seis fallos**, todos arreglados, y ninguno
+lo veía axe-core —axe comprueba que un botón TENGA nombre, no que el nombre
+sirva para algo—:
+
+| Dónde | Qué pasaba |
+|---|---|
+| Creador, cada paso | El paso cambiaba en silencio: «Especie», «3 de 12» eran párrafos sueltos |
+| Creador, «Siguiente» bloqueado | Con `disabled` nativo salía del recorrido por tabulador: no se encontraba el botón ni el motivo |
+| Biblioteca | El contador de resultados cambiaba sin anunciarse, y «sin resultados» tampoco |
+| Avisos de deshacer | Dos avisos apilados daban dos botones «Deshacer» idénticos |
+| Ficha, al abrirla | Cantaba «12 de 12 puntos de golpe» sin que nadie lo pidiera, y en `assertive`: cortaba lo que el lector estuviera diciendo |
+| Ficha, cerrar un diálogo | El foco acababa en `<body>`, no en el botón que lo abrió |
+
+Los dos últimos son los que más cuesta encontrar leyendo código, porque el
+componente tenía escrito el arreglo y **no funcionaba**: se vieron midiendo.
+
+Eso quedó fijado en `tests/e2e/lector-de-pantalla.spec.ts` (18 casos), así que
+las seis pruebas ya no se repiten a mano: se corren.
+
+```bash
+npx playwright test lector-de-pantalla
+```
+
+**Lo que sigue necesitando una persona con oídos** es lo de siempre, y es lo
+que hay que hacer con esta guía: si las frases se entienden al escucharlas, si
+el ritmo de las interrupciones molesta, y si el recorrido resulta cómodo. Una
+máquina comprueba que la información LLEGA; no que se entienda.
+
+---
+
 ## Qué es esto y por qué no lo puede hacer una máquina
 
 Un **lector de pantalla** es un programa que lee la pantalla en voz alta. Lo usa
@@ -129,16 +163,23 @@ Para que no gastes tiempo en esto:
 |---|---|
 | Nombres, roles y etiquetas | axe-core, 0 infracciones |
 | Contraste AA | test propio, 32 comprobaciones, los dos temas |
-| Jerarquía de encabezados y landmarks | axe-core |
+| Jerarquía de encabezados y landmarks | axe-core, y la jerarquía completa de la ficha en `official-sheet.spec.ts` |
 | Foco atrapado en diálogos | `tests/e2e/keyboard.spec.ts` |
-| Foco devuelto al cerrar | ídem |
-| Anuncio del daño y la curación | ídem |
+| Foco devuelto al cerrar | `keyboard.spec.ts` (Homebrew) y `lector-de-pantalla.spec.ts` (la ficha) |
+| Anuncio del daño y la curación | `keyboard.spec.ts` y `lector-de-pantalla.spec.ts` |
 | Nombres distintos en filas repetidas | `tests/e2e/accessibility.spec.ts` |
+| Las seis pruebas de esta guía, su parte mecánica | `tests/e2e/lector-de-pantalla.spec.ts` |
+
+> **Ojo con esta tabla.** Antes decía que el foco devuelto al cerrar ya estaba
+> comprobado, y era verdad **a medias**: el test existía, pasaba, y cubría el
+> diálogo de Homebrew. El de la ficha, con el mismo componente, dejaba el foco
+> en `<body>`. Que una fila diga «comprobado» significa que hay un test, no
+> que cubra todas las pantallas.
 
 Se corren con:
 
 ```bash
-npx playwright test accessibility keyboard
+npx playwright test accessibility keyboard lector-de-pantalla
 ```
 
 Lo que queda para una persona es lo único que no se puede automatizar: **si se

@@ -33,13 +33,17 @@ import { cn } from './cn';
  * El último elemento que tuvo el foco FUERA de un diálogo.
  *
  * La versión anterior guardaba `document.activeElement` dentro de
- * `onOpenAutoFocus` y NO funcionaba: se midió el recorrido entero —abrir el
- * ajuste de PG, cerrar con Escape— y el foco acababa en `<body>` igual.
+ * `onOpenAutoFocus`, y funcionaba EN ALGUNOS SITIOS: el diálogo de Homebrew
+ * devolvía el foco —hay un test que lo comprueba y pasa— y el de puntos de
+ * golpe no. Medido en la ficha: se abría el ajuste de PG, se cerraba con
+ * Escape y el foco acababa en `<body>`.
  *
- * Por eso el dato se toma de aquí, que no depende de que llegue ningún evento
- * de apertura. El registro es de módulo y no por instancia porque algunas
- * hojas se montan A LA VEZ que se abren —`{editando && <EditarSheet/>}`— y un
- * efecto dentro del componente llegaría tarde para ver quién las abrió.
+ * No se persiguió por qué una pantalla sí y la otra no. Depender de CUÁNDO
+ * llega un evento y de qué tiene el foco en ese instante es frágil por
+ * construcción, y esto no lo necesita: el registro ya tiene el dato cuando
+ * hace falta. Es de módulo y no por instancia porque algunas hojas se montan
+ * A LA VEZ que se abren —`{editando && <EditarSheet/>}`— y un efecto dentro
+ * del componente llegaría tarde para ver quién las abrió.
  *
  * Se ignora lo que ya está dentro de un diálogo: por eso sigue valiendo al
  * cerrar, y con dos hojas encadenadas se vuelve al botón de la primera y no al
@@ -86,18 +90,12 @@ export function Sheet({
         <Dialog.Content
           onCloseAutoFocus={(event) => {
             /*
-              Se lee el registro global AQUÍ y no en `onOpenAutoFocus`.
+              Se lee el registro global AQUÍ y no al abrir: así no hace falta
+              que llegue ningún evento de apertura ni acertar con el instante.
 
-              Guardarlo al abrir era lo que hacía la versión anterior, y se
-              midió que no funciona: el foco seguía acabando en `<body>` tanto
-              antes como después de arreglar QUÉ se guardaba. La explicación que
-              encaja es que ese evento no llega, con lo cual la referencia
-              quedaba vacía y esta función salía por la guarda de abajo sin
-              siquiera llamar a `preventDefault`.
-
-              Leerlo al cerrar no necesita el evento de apertura, y da el mismo
-              elemento: mientras el diálogo está abierto, todo lo que recibe el
-              foco está dentro de él, y el registro ignora eso.
+              Da el mismo elemento, porque mientras el diálogo está abierto
+              todo lo que recibe el foco está dentro de él, y el registro
+              ignora lo que esté dentro de un diálogo.
             */
             const target = ultimoFocoFuera;
             // Si el elemento ya no existe —la lista se reordenó, la fila se
@@ -106,14 +104,10 @@ export function Sheet({
             if (!target || !document.contains(target)) return;
             event.preventDefault();
             /*
-              El foco se pide en el cuadro SIGUIENTE, no ahora.
-
-              Enfocar aquí no servía de nada y se midió: el contenido del
-              diálogo todavía no se desmontó, y cuando React lo quita el
-              navegador ve que el elemento con el foco desapareció y lo manda a
-              `<body>` —deshaciendo lo que acabábamos de hacer—. Esperar un
-              cuadro pone la llamada después del desmontaje, que es cuando
-              queda en pie.
+              El foco se pide en el cuadro SIGUIENTE, para que la llamada caiga
+              después de que React desmonte el diálogo. Al quitar el elemento
+              que tenía el foco, el navegador lo manda a `<body>`: hacerlo
+              antes es arriesgarse a que ese reseteo lo deshaga.
             */
             requestAnimationFrame(() => {
               if (document.contains(target)) target.focus();
