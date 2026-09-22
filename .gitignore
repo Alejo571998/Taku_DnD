@@ -1,0 +1,35 @@
+node_modules/
+.next/
+out/
+build/
+coverage/
+playwright-report/
+test-results/
+.tsbuildinfo
+*.tsbuildinfo
+
+# PWA generado
+public/sw.js
+public/sw.js.map
+public/swe-worker-*.js
+
+# Entorno — nunca commitear secretos
+.env
+.env.local
+.env*.local
+
+# ─── Material con derechos: NUNCA al repositorio ─────────────────────────────
+# El Manual del Jugador, el del Dungeon Master, el Manual de Monstruos, «The GM
+# book of NPCs» y las aventuras publicadas viven en el disco de su dueño. Son
+# 1,2 GB y son obras con copyright: subirlas a GitHub es DISTRIBUIRLAS, y en un
+# repositorio publico lo es para cualquiera.
+#
+# La aplicacion se alimenta del SRD (CC-BY), que si se puede redistribuir y
+# esta en `data/srd-raw/`. Estos PDF no entran ni en el contenido ni en el
+# repositorio.
+PDFs_Taku_DnD/
+*.pdf
+
+# Sistema
+.DS_Store
+Thumbs.db

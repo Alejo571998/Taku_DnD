@@ -1,0 +1,178 @@
+{
+  "app": {
+    "name": "TAKU D&D",
+    "tagline": "D&D en tu bolsillo",
+    "description": "Creá, gestioná y jugá tus personajes de Dungeons & Dragons."
+  },
+  "nav": {
+    "home": "Inicio",
+    "characters": "Personajes",
+    "library": "Biblioteca",
+    "campaigns": "Campañas",
+    "profile": "Perfil",
+    "play": "Juego",
+    "manage": "Gestión"
+  },
+  "ability": {
+    "str": "Fuerza",
+    "dex": "Destreza",
+    "con": "Constitución",
+    "int": "Inteligencia",
+    "wis": "Sabiduría",
+    "cha": "Carisma",
+    "abbr": {
+      "str": "FUE",
+      "dex": "DES",
+      "con": "CON",
+      "int": "INT",
+      "wis": "SAB",
+      "cha": "CAR"
+    }
+  },
+  "skill": {
+    "acrobatics": "Acrobacias",
+    "animal-handling": "Trato con animales",
+    "arcana": "Arcanos",
+    "athletics": "Atletismo",
+    "deception": "Engaño",
+    "history": "Historia",
+    "insight": "Perspicacia",
+    "intimidation": "Intimidación",
+    "investigation": "Investigación",
+    "medicine": "Medicina",
+    "nature": "Naturaleza",
+    "perception": "Percepción",
+    "performance": "Interpretación",
+    "persuasion": "Persuasión",
+    "religion": "Religión",
+    "sleight-of-hand": "Juego de manos",
+    "stealth": "Sigilo",
+    "survival": "Supervivencia"
+  },
+  "currency": {
+    "gp": {
+      "abbr": "PO",
+      "name": "Pieza de oro"
+    },
+    "pp": {
+      "abbr": "PP",
+      "name": "Pieza de platino"
+    },
+    "ep": {
+      "abbr": "PE",
+      "name": "Pieza de electro"
+    },
+    "sp": {
+      "abbr": "PA",
+      "name": "Pieza de plata"
+    },
+    "cp": {
+      "abbr": "PC",
+      "name": "Pieza de cobre"
+    }
+  },
+  "error": {
+    "ammunition.depleted": "Te quedaste sin munición",
+    "resource.insufficient": "No te queda suficiente de ese recurso",
+    "resource.notFound": "Ese recurso no existe en tu personaje",
+    "spellSlot.insufficient": "No te quedan espacios de ese nivel",
+    "item.notFound": "No encontramos ese objeto",
+    "item.insufficientQuantity": "No tenés esa cantidad",
+    "slot.incompatible": "Ese objeto no va en esa ranura",
+    "slot.occupied": "Esa ranura ya está ocupada",
+    "slot.twoHandedConflict": "No podés usar eso con las manos ocupadas",
+    "attunement.limitReached": "Ya tenés 3 objetos sintonizados",
+    "attunement.notAttunable": "Ese objeto no requiere sintonización",
+    "character.notFound": "No encontramos el personaje",
+    "content.notFound": "No encontramos ese contenido",
+    "content.incompatibleRuleset": "Ese contenido es de otra edición",
+    "dice.invalidExpression": "No entendimos esa tirada",
+    "validation.failed": "No pudimos completar esta acción",
+    "level.outOfRange": "Ese nivel no existe",
+    "pointBuy.insufficientPoints": "No te alcanzan los puntos",
+    "ability.outOfRange": "Esa puntuación está fuera de rango",
+    "content.invalidShape": "Ese contenido no tiene el formato esperado"
+  },
+  "errorDetail": {
+    "ammunition.depleted": "Tenés {have} y necesitás {need}. Podés recargar desde el inventario.",
+    "resource.insufficient": "Te quedan {have} y necesitás {need}. Se recupera al descansar.",
+    "spellSlot.insufficient": "No te quedan espacios de nivel {level}. Probá con uno de nivel superior o descansá.",
+    "attunement.limitReached": "Desintonizá otro objeto primero.",
+    "slot.twoHandedConflict": "Guardá lo que tenés en las manos antes de equipar esto."
+  },
+  "history": {
+    "damage": "−{amount} PG",
+    "heal": "+{amount} PG",
+    "tempHp.replaced": "{amount} PG temporales",
+    "tempHp.kept": "Mantenés {amount} PG temporales",
+    "setHp": "PG ajustados a {value}",
+    "resource.spend": "Gastaste {amount}",
+    "resource.restore": "Recuperaste {amount}",
+    "spell.cast": "{spell} lanzado (nivel {level})",
+    "spell.prepared": "{spell} preparado",
+    "spell.unprepared": "{spell} sin preparar",
+    "spell.learned": "Aprendiste {spell}",
+    "ammunition.consumed": "{item}: quedan {remaining}",
+    "item.equipped": "Objeto equipado",
+    "item.unequipped": "Objeto guardado",
+    "item.added": "{item} agregado",
+    "item.removed": "{item} eliminado",
+    "item.consumed": "Usaste {item}",
+    "item.attuned": "Objeto sintonizado",
+    "condition.applied": "{condition} aplicada",
+    "condition.removed": "{condition} eliminada",
+    "currency.added": "Monedas agregadas",
+    "currency.removed": "Monedas gastadas",
+    "currency.converted": "Recibiste {received}",
+    "rest.short": "Descanso corto completado",
+    "rest.long": "Descanso largo completado",
+    "levelUp": "¡{className} nivel {level}! +{hitPoints} PG",
+    "levelUp.reverted": "Subida de nivel deshecha (nivel {level})",
+    "xp.gained": "+{amount} PX ({total} en total)",
+    "xp.lost": "−{amount} PX",
+    "xp.set": "Experiencia ajustada a {value}",
+    "compatibility.accepted": "{name} se añadió desde otra edición",
+    "compatibility.alreadyAccepted": "Ya estaba aceptado",
+    "compatibility.revoked": "Quitado del registro de otra edición",
+    "workspace.claimed": "Personaje movido a tu cuenta",
+    "conflict.local": "Se mantuvo la versión de este dispositivo",
+    "conflict.server": "Se adoptó la versión del otro dispositivo",
+    "identity.updated": "Personaje actualizado",
+    "skill.updated": "Competencia actualizada",
+    "settings.updated": "Ajustes guardados",
+    "note.saved": "Nota guardada",
+    "note.deleted": "Nota eliminada",
+    "spell.favorite": "Favorito actualizado",
+    "condition.level": "Nivel de condición: {level}",
+    "item.renamed": "Objeto renombrado",
+    "item.unattuned": "Objeto desintonizado",
+    "item.favorite": "Favorito actualizado",
+    "concentration.broken": "Concentración rota",
+    "spell.slot.restored": "Espacio recuperado",
+    "deathSaves.recorded": "Salvación contra muerte anotada",
+    "deathSaves.reset": "Salvaciones contra muerte reiniciadas",
+    "charges.used": "Cargas usadas",
+    "currency.consolidated": "Monedas consolidadas",
+    "heroicInspiration.gained": "Ganaste inspiración heroica",
+    "heroicInspiration.spent": "Usaste la inspiración heroica",
+    "heroicInspiration.unchanged": "La inspiración heroica ya estaba así"
+  },
+  "common": {
+    "undo": "Deshacer",
+    "cancel": "Cancelar",
+    "confirm": "Confirmar",
+    "save": "Guardar",
+    "delete": "Eliminar",
+    "next": "Siguiente",
+    "back": "Atrás",
+    "search": "Buscar",
+    "loading": "Cargando…",
+    "offline": "Sin conexión",
+    "synced": "Todo sincronizado",
+    "done": "Listo"
+  },
+  "settings": {
+    "language": "Idioma de la interfaz",
+    "languageHint": "Los textos del sistema —errores, historial y avisos— cambian al instante. El contenido del SRD sigue su propia traducción."
+  }
+}

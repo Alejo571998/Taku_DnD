@@ -1,0 +1,178 @@
+{
+  "app": {
+    "name": "TAKU D&D",
+    "tagline": "D&D in your pocket",
+    "description": "Create, manage and play your Dungeons & Dragons characters."
+  },
+  "nav": {
+    "home": "Home",
+    "characters": "Characters",
+    "library": "Library",
+    "campaigns": "Campaigns",
+    "profile": "Profile",
+    "play": "Play",
+    "manage": "Manage"
+  },
+  "ability": {
+    "str": "Strength",
+    "dex": "Dexterity",
+    "con": "Constitution",
+    "int": "Intelligence",
+    "wis": "Wisdom",
+    "cha": "Charisma",
+    "abbr": {
+      "str": "STR",
+      "dex": "DEX",
+      "con": "CON",
+      "int": "INT",
+      "wis": "WIS",
+      "cha": "CHA"
+    }
+  },
+  "skill": {
+    "acrobatics": "Acrobatics",
+    "animal-handling": "Animal Handling",
+    "arcana": "Arcana",
+    "athletics": "Athletics",
+    "deception": "Deception",
+    "history": "History",
+    "insight": "Insight",
+    "intimidation": "Intimidation",
+    "investigation": "Investigation",
+    "medicine": "Medicine",
+    "nature": "Nature",
+    "perception": "Perception",
+    "performance": "Performance",
+    "persuasion": "Persuasion",
+    "religion": "Religion",
+    "sleight-of-hand": "Sleight of Hand",
+    "stealth": "Stealth",
+    "survival": "Survival"
+  },
+  "currency": {
+    "gp": {
+      "abbr": "gp",
+      "name": "Gold piece"
+    },
+    "pp": {
+      "abbr": "pp",
+      "name": "Platinum piece"
+    },
+    "ep": {
+      "abbr": "ep",
+      "name": "Electrum piece"
+    },
+    "sp": {
+      "abbr": "sp",
+      "name": "Silver piece"
+    },
+    "cp": {
+      "abbr": "cp",
+      "name": "Copper piece"
+    }
+  },
+  "error": {
+    "ammunition.depleted": "You're out of ammunition",
+    "resource.insufficient": "Not enough of that resource left",
+    "resource.notFound": "That resource doesn't exist on your character",
+    "spellSlot.insufficient": "No spell slots left at that level",
+    "item.notFound": "We couldn't find that item",
+    "item.insufficientQuantity": "You don't have that many",
+    "slot.incompatible": "That item doesn't go in that slot",
+    "slot.occupied": "That slot is already taken",
+    "slot.twoHandedConflict": "You can't use that with your hands full",
+    "attunement.limitReached": "You already have 3 attuned items",
+    "attunement.notAttunable": "That item doesn't require attunement",
+    "character.notFound": "We couldn't find the character",
+    "content.notFound": "We couldn't find that content",
+    "content.incompatibleRuleset": "That content is from a different edition",
+    "dice.invalidExpression": "We didn't understand that roll",
+    "validation.failed": "We couldn't complete this action",
+    "level.outOfRange": "That level doesn't exist",
+    "pointBuy.insufficientPoints": "You don't have enough points",
+    "ability.outOfRange": "That score is out of range",
+    "content.invalidShape": "That content isn't in the expected format"
+  },
+  "errorDetail": {
+    "ammunition.depleted": "You have {have} and need {need}. You can restock from your inventory.",
+    "resource.insufficient": "You have {have} left and need {need}. It recovers on a rest.",
+    "spellSlot.insufficient": "No level {level} slots left. Try a higher one, or take a rest.",
+    "attunement.limitReached": "Unattune another item first.",
+    "slot.twoHandedConflict": "Stow what you're holding before equipping this."
+  },
+  "history": {
+    "damage": "−{amount} HP",
+    "heal": "+{amount} HP",
+    "tempHp.replaced": "{amount} temporary HP",
+    "tempHp.kept": "You keep {amount} temporary HP",
+    "setHp": "HP set to {value}",
+    "resource.spend": "Spent {amount}",
+    "resource.restore": "Recovered {amount}",
+    "spell.cast": "{spell} cast (level {level})",
+    "spell.prepared": "{spell} prepared",
+    "spell.unprepared": "{spell} unprepared",
+    "spell.learned": "Learned {spell}",
+    "ammunition.consumed": "{item}: {remaining} left",
+    "item.equipped": "Item equipped",
+    "item.unequipped": "Item stowed",
+    "item.added": "{item} added",
+    "item.removed": "{item} removed",
+    "item.consumed": "Used {item}",
+    "item.attuned": "Item attuned",
+    "condition.applied": "{condition} applied",
+    "condition.removed": "{condition} removed",
+    "currency.added": "Coins added",
+    "currency.removed": "Coins spent",
+    "currency.converted": "Received {received}",
+    "rest.short": "Short rest complete",
+    "rest.long": "Long rest complete",
+    "levelUp": "{className} level {level}! +{hitPoints} HP",
+    "levelUp.reverted": "Level-up undone (level {level})",
+    "xp.gained": "+{amount} XP ({total} total)",
+    "xp.lost": "−{amount} XP",
+    "xp.set": "Experience set to {value}",
+    "compatibility.accepted": "{name} added from another edition",
+    "compatibility.alreadyAccepted": "Already accepted",
+    "compatibility.revoked": "Removed from the other-edition log",
+    "workspace.claimed": "Character moved to your account",
+    "conflict.local": "Kept this device's version",
+    "conflict.server": "Adopted the other device's version",
+    "identity.updated": "Character updated",
+    "skill.updated": "Proficiency updated",
+    "settings.updated": "Settings saved",
+    "note.saved": "Note saved",
+    "note.deleted": "Note deleted",
+    "spell.favorite": "Favourite updated",
+    "condition.level": "Condition level: {level}",
+    "item.renamed": "Item renamed",
+    "item.unattuned": "Item unattuned",
+    "item.favorite": "Favourite updated",
+    "concentration.broken": "Concentration broken",
+    "spell.slot.restored": "Slot restored",
+    "deathSaves.recorded": "Death save recorded",
+    "deathSaves.reset": "Death saves reset",
+    "charges.used": "Charges used",
+    "currency.consolidated": "Coins consolidated",
+    "heroicInspiration.gained": "Gained heroic inspiration",
+    "heroicInspiration.spent": "Spent heroic inspiration",
+    "heroicInspiration.unchanged": "Heroic inspiration was already in that state"
+  },
+  "common": {
+    "undo": "Undo",
+    "cancel": "Cancel",
+    "confirm": "Confirm",
+    "save": "Save",
+    "delete": "Delete",
+    "next": "Next",
+    "back": "Back",
+    "search": "Search",
+    "loading": "Loading…",
+    "offline": "Offline",
+    "synced": "All synced",
+    "done": "Done"
+  },
+  "settings": {
+    "language": "Interface language",
+    "languageHint": "System text — errors, history and warnings — switches right away. SRD content follows its own translation."
+  }
+}

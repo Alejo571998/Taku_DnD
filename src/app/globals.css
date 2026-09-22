@@ -1,0 +1,527 @@
+@import 'tailwindcss';
+
+/**
+ * DESIGN SYSTEM — TAKU D&D
+ *
+ * Dirección artística fijada por las referencias visuales aprobadas:
+ * negro con tinte rojo, carmesí como acento de marca, halos rojos en lo
+ * activo, arte de fantasía a sangre en las cabeceras.
+ *
+ * NO debe parecer un PDF, una wiki antigua, un panel administrativo ni una
+ * interfaz genérica (MASTER SPEC §45). Se juega de noche, en mesas mal
+ * iluminadas, con el teléfono en una mano: el modo oscuro no es una
+ * variante, es el estado natural del producto.
+ */
+
+@theme {
+  /* ── Tipografía ─────────────────────────────────────────────────────────── */
+  --font-display: var(--font-cinzel), 'Iowan Old Style', Georgia, serif;
+  --font-sans: var(--font-inter), ui-sans-serif, system-ui, -apple-system, sans-serif;
+  --font-mono: ui-monospace, 'SF Mono', 'Cascadia Code', monospace;
+
+  /* Escala tipográfica — razón 1.2, anclada en 16px */
+  --text-2xs: 0.694rem;
+  --text-xs: 0.833rem;
+  --text-sm: 0.9rem;
+  --text-base: 1rem;
+  --text-lg: 1.2rem;
+  --text-xl: 1.44rem;
+  --text-2xl: 1.728rem;
+  --text-3xl: 2.074rem;
+  --text-4xl: 2.488rem;
+  --text-5xl: 2.986rem;
+
+  /* ── Obsidiana: el negro NO es neutro, lleva tinte rojo ─────────────────── */
+  --color-obsidian-950: oklch(0.095 0.012 18);
+  --color-obsidian-900: oklch(0.130 0.016 18);
+  --color-obsidian-850: oklch(0.160 0.020 18);
+  --color-obsidian-800: oklch(0.195 0.024 18);
+  --color-obsidian-700: oklch(0.255 0.028 18);
+  --color-obsidian-600: oklch(0.345 0.026 18);
+  --color-obsidian-500: oklch(0.455 0.022 18);
+  --color-obsidian-400: oklch(0.585 0.018 18);
+  --color-obsidian-300: oklch(0.705 0.014 18);
+  --color-obsidian-200: oklch(0.825 0.010 18);
+  --color-obsidian-100: oklch(0.910 0.008 18);
+  --color-obsidian-50: oklch(0.965 0.005 18);
+
+  /* ── Carmesí: el acento de marca ────────────────────────────────────────── */
+  --color-crimson-300: oklch(0.775 0.145 20);
+  --color-crimson-400: oklch(0.672 0.198 21);
+  --color-crimson-500: oklch(0.585 0.222 22);
+  --color-crimson-600: oklch(0.505 0.205 22);
+  --color-crimson-700: oklch(0.425 0.175 22);
+  --color-crimson-800: oklch(0.335 0.140 22);
+  --color-crimson-900: oklch(0.245 0.100 22);
+
+  /* ── Oro: reservado para lo legendario, nunca para acciones ─────────────── */
+  --color-gold-300: oklch(0.885 0.085 82);
+  --color-gold-400: oklch(0.820 0.105 80);
+  --color-gold-500: oklch(0.752 0.118 78);
+  --color-gold-600: oklch(0.660 0.112 75);
+
+  /* ── Semánticos — nunca comunican SOLO por color (MASTER SPEC §47) ──────── */
+  --color-vitality-400: oklch(0.775 0.150 150);
+  --color-vitality-500: oklch(0.680 0.160 152);
+  --color-vitality-600: oklch(0.575 0.145 153);
+  --color-arcane-400: oklch(0.715 0.155 288);
+  --color-arcane-500: oklch(0.620 0.175 290);
+  --color-arcane-600: oklch(0.525 0.168 292);
+  --color-warning-400: oklch(0.810 0.140 70);
+  --color-warning-500: oklch(0.730 0.150 65);
+  --color-frost-400: oklch(0.760 0.115 225);
+  --color-frost-500: oklch(0.660 0.130 228);
+
+  /* Pergamino para el tema claro: papel envejecido, no blanco puro */
+  --color-parchment-50: oklch(0.982 0.008 60);
+  --color-parchment-100: oklch(0.962 0.014 55);
+  --color-parchment-200: oklch(0.928 0.020 52);
+
+  /* ── Geometría ──────────────────────────────────────────────────────────── */
+  --radius-xs: 0.25rem;
+  --radius-sm: 0.5rem;
+  --radius-md: 0.75rem;
+  --radius-lg: 1rem;
+  --radius-xl: 1.25rem;
+  --radius-2xl: 1.75rem;
+
+  /* ── Elevación y halos ──────────────────────────────────────────────────── */
+  --shadow-raised: 0 1px 2px oklch(0 0 0 / 0.40), 0 2px 10px oklch(0 0 0 / 0.28);
+  --shadow-overlay: 0 12px 40px oklch(0 0 0 / 0.55), 0 2px 10px oklch(0 0 0 / 0.35);
+  --shadow-crimson: 0 4px 20px oklch(0.585 0.222 22 / 0.32);
+  --shadow-crimson-lg: 0 8px 36px oklch(0.585 0.222 22 / 0.45);
+
+  /* ── Movimiento ─────────────────────────────────────────────────────────── */
+  --ease-out-quint: cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+/**
+ * TOKENS SEMÁNTICOS
+ *
+ * Los componentes usan SIEMPRE estos, nunca la paleta cruda. Cambiar el tema
+ * es cambiar este bloque, no doscientos componentes.
+ */
+:root {
+  color-scheme: dark;
+
+  /*
+   * Escalón de superficie amplio a propósito.
+   *
+   * Con un salto pequeño entre el fondo y las tarjetas, en pantalla OLED y con
+   * brillo bajo —que es como se juega— las tarjetas desaparecen y todo parece
+   * un solo plano. La referencia visual tiene tarjetas claramente recortadas
+   * sobre el negro, y eso pide contraste real, no sutileza.
+   */
+  --surface-base: var(--color-obsidian-950);
+  --surface-raised: var(--color-obsidian-850);
+  --surface-overlay: var(--color-obsidian-800);
+  --surface-sunken: oklch(0.072 0.010 18);
+  --surface-interactive: var(--color-obsidian-700);
+
+  --border-subtle: oklch(1 0 0 / 0.09);
+  --border-default: oklch(1 0 0 / 0.15);
+  --border-strong: oklch(1 0 0 / 0.26);
+  --border-accent: oklch(0.585 0.222 22 / 0.50);
+
+  --text-primary: var(--color-obsidian-50);
+  --text-secondary: var(--color-obsidian-300);
+  /* Los rótulos de sección deben LEERSE, no insinuarse. */
+  --text-tertiary: oklch(0.620 0.016 18);
+  --text-inverse: oklch(0.99 0 0);
+
+  --accent: var(--color-crimson-500);
+  --accent-hover: var(--color-crimson-400);
+  --accent-strong: var(--color-crimson-600);
+  --accent-muted: oklch(0.585 0.222 22 / 0.15);
+  --accent-text: var(--color-crimson-400);
+  --accent-on: oklch(0.99 0 0);
+
+  /* El daño comparte familia con el acento: en este producto, el rojo ES
+     la marca y también el peligro. Se distinguen por contexto y por icono,
+     nunca solo por color. */
+  --danger: var(--color-crimson-500);
+  --danger-text: var(--color-crimson-300);
+  --danger-muted: oklch(0.585 0.222 22 / 0.16);
+
+  --success: var(--color-vitality-500);
+  --success-text: var(--color-vitality-400);
+  --success-muted: oklch(0.680 0.160 152 / 0.16);
+
+  --arcane: var(--color-arcane-500);
+  --arcane-text: var(--color-arcane-400);
+  --arcane-muted: oklch(0.620 0.175 290 / 0.16);
+
+  --warning: var(--color-warning-500);
+  --warning-text: var(--color-warning-400);
+  --warning-muted: oklch(0.730 0.150 65 / 0.16);
+
+  --legendary: var(--color-gold-500);
+  --legendary-text: var(--color-gold-400);
+  --legendary-muted: oklch(0.752 0.118 78 / 0.14);
+
+  --focus-ring: var(--color-crimson-400);
+
+  /* Zonas seguras en teléfonos con notch */
+  --safe-top: env(safe-area-inset-top, 0px);
+  --safe-bottom: env(safe-area-inset-bottom, 0px);
+  --nav-height: 4.25rem;
+  /**
+   * Espacio que la barra inferior le roba a la pantalla.
+   *
+   * En escritorio NO hay barra inferior —la navegacion esta en la lateral—, asi
+   * que cualquier elemento fijo que reserve ese hueco deja una franja vacia
+   * abajo. Con un token que vale 0 a partir de `lg`, todos se corrigen a la vez
+   * en vez de cada uno por su cuenta.
+   */
+  --nav-offset: calc(var(--nav-height) + var(--safe-bottom));
+  --sidebar-width: 15rem;
+}
+
+[data-theme='light'] {
+  color-scheme: light;
+
+  --surface-base: var(--color-parchment-50);
+  --surface-raised: oklch(1 0 0);
+  --surface-overlay: oklch(1 0 0);
+  --surface-sunken: var(--color-parchment-100);
+  --surface-interactive: var(--color-parchment-100);
+
+  --border-subtle: oklch(0.130 0.016 18 / 0.08);
+  --border-default: oklch(0.130 0.016 18 / 0.14);
+  --border-strong: oklch(0.130 0.016 18 / 0.26);
+  --border-accent: oklch(0.505 0.205 22 / 0.40);
+
+  --text-primary: var(--color-obsidian-900);
+  --text-secondary: var(--color-obsidian-700);
+  --text-tertiary: var(--color-obsidian-600);
+  --text-inverse: oklch(0.99 0 0);
+
+  --accent: var(--color-crimson-600);
+  --accent-hover: var(--color-crimson-500);
+  --accent-strong: var(--color-crimson-700);
+  --accent-muted: oklch(0.505 0.205 22 / 0.11);
+  --accent-text: var(--color-crimson-700);
+
+  --danger: var(--color-crimson-600);
+  --danger-text: var(--color-crimson-700);
+  --danger-muted: oklch(0.505 0.205 22 / 0.11);
+
+  --success: var(--color-vitality-600);
+  /* 0.575L daba 3.89:1 sobre el fondo claro: por debajo del minimo AA. */
+  --success-text: oklch(0.505 0.138 154);
+  --success-muted: oklch(0.575 0.145 153 / 0.12);
+
+  --arcane: var(--color-arcane-600);
+  --arcane-text: var(--color-arcane-600);
+  --arcane-muted: oklch(0.525 0.168 292 / 0.12);
+
+  --warning: var(--color-warning-500);
+  /* 0.560L pasaba por 0.08 de margen; 0.495L lo deja en ~5.7:1. */
+  --warning-text: oklch(0.495 0.122 58);
+  --warning-muted: oklch(0.730 0.150 65 / 0.14);
+
+  --legendary: var(--color-gold-600);
+  --legendary-text: var(--color-gold-600);
+  --legendary-muted: oklch(0.660 0.112 75 / 0.14);
+
+  --focus-ring: var(--color-crimson-600);
+}
+
+/* ── Reset y base ─────────────────────────────────────────────────────────── */
+
+/**
+ * TODO el reset va dentro de `@layer base`.
+ *
+ * En CSS, lo que está FUERA de una capa gana a lo que está dentro. Tailwind 4
+ * pone sus utilidades en `@layer utilities`, así que un `button { padding: 0 }`
+ * sin capa anula `px-4` en cada botón de la aplicación — y el síntoma no es un
+ * error, es una maquetación que se descoloca sin explicación.
+ */
+@layer base {
+  *,
+  *::before,
+  *::after {
+    box-sizing: border-box;
+  }
+
+  * {
+    margin: 0;
+  }
+
+  html {
+    -webkit-text-size-adjust: 100%;
+    text-rendering: optimizeLegibility;
+  }
+
+  body {
+    min-height: 100dvh;
+    background: var(--surface-base);
+    color: var(--text-primary);
+    font-family: var(--font-sans);
+    font-size: var(--text-base);
+    line-height: 1.55;
+    -webkit-font-smoothing: antialiased;
+    /* Impide el rebote elástico que rompe la sensación de aplicación */
+    overscroll-behavior-y: none;
+  }
+
+  h1, h2, h3, h4 {
+    font-family: var(--font-display);
+    font-weight: 600;
+    line-height: 1.15;
+    letter-spacing: -0.01em;
+  }
+
+  button, input, select, textarea {
+    font: inherit;
+    color: inherit;
+  }
+
+  button {
+    cursor: pointer;
+    background: none;
+    border: none;
+    padding: 0;
+  }
+
+  img, svg, video {
+    display: block;
+    max-width: 100%;
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--focus-ring);
+    outline-offset: 2px;
+    border-radius: var(--radius-xs);
+  }
+
+  :focus:not(:focus-visible) {
+    outline: none;
+  }
+}
+
+/**
+ * Atmósfera: brasas apagadas en los bordes de la pantalla.
+ * Un fondo plano se ve barato; un degradado obvio se ve a IA. Esto es
+ * apenas perceptible y sostiene la ambientación sin llamar la atención.
+ */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  background:
+    radial-gradient(ellipse 90% 45% at 50% -8%, oklch(0.585 0.222 22 / 0.13), transparent 70%),
+    radial-gradient(ellipse 70% 40% at 92% 96%, oklch(0.425 0.175 22 / 0.10), transparent 70%),
+    radial-gradient(ellipse 60% 35% at 4% 70%, oklch(0.620 0.175 290 / 0.05), transparent 70%);
+}
+
+[data-theme='light'] body::before {
+  background:
+    radial-gradient(ellipse 90% 45% at 50% -8%, oklch(0.505 0.205 22 / 0.09), transparent 70%),
+    radial-gradient(ellipse 70% 40% at 92% 96%, oklch(0.505 0.205 22 / 0.06), transparent 70%);
+}
+
+/* ── Accesibilidad ────────────────────────────────────────────────────────── */
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* ── Utilidades del sistema ───────────────────────────────────────────────── */
+
+@utility surface-card {
+  background: var(--surface-raised);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-lg);
+}
+
+/** Tarjeta con halo carmesí: solo para lo activo o destacado. */
+@utility surface-card-accent {
+  background:
+    linear-gradient(180deg, oklch(0.585 0.222 22 / 0.10), transparent 55%),
+    var(--surface-raised);
+  border: 1px solid var(--border-accent);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-crimson);
+}
+
+@utility text-numeric {
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: 'tnum';
+}
+
+@utility scrollbar-slim {
+  scrollbar-width: thin;
+  scrollbar-color: var(--border-strong) transparent;
+}
+
+/** Degradado de acción: el botón principal de la marca. */
+@utility bg-crimson-gradient {
+  background: linear-gradient(135deg, var(--color-crimson-400), var(--color-crimson-600));
+}
+
+/** Lienzo de arte con desvanecido inferior, para las cabeceras heroicas. */
+@utility art-fade {
+  mask-image: linear-gradient(180deg, black 45%, transparent 100%);
+  -webkit-mask-image: linear-gradient(180deg, black 45%, transparent 100%);
+}
+
+@media (pointer: fine) {
+  ::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+  }
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  ::-webkit-scrollbar-thumb {
+    background: var(--border-default);
+    border-radius: 999px;
+    border: 3px solid transparent;
+    background-clip: content-box;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background: var(--border-strong);
+    background-clip: content-box;
+  }
+}
+
+/* ── Animaciones ──────────────────────────────────────────────────────────── */
+
+@keyframes fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes slide-up {
+  from { transform: translateY(8px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+
+@keyframes sheet-in {
+  from { transform: translateY(100%); }
+  to { transform: translateY(0); }
+}
+
+@keyframes pulse-damage {
+  0%, 100% { box-shadow: 0 0 0 0 transparent; }
+  30% { box-shadow: 0 0 0 4px var(--danger-muted); }
+}
+
+@keyframes pulse-heal {
+  0%, 100% { box-shadow: 0 0 0 0 transparent; }
+  30% { box-shadow: 0 0 0 4px var(--success-muted); }
+}
+
+@keyframes die-tumble {
+  0% { transform: rotate(0deg) scale(1); }
+  40% { transform: rotate(220deg) scale(1.14); }
+  70% { transform: rotate(340deg) scale(0.96); }
+  100% { transform: rotate(360deg) scale(1); }
+}
+
+@keyframes ember-glow {
+  0%, 100% { opacity: 0.55; }
+  50% { opacity: 1; }
+}
+
+.animate-fade-in { animation: fade-in 180ms var(--ease-out-quint); }
+.animate-slide-up { animation: slide-up 220ms var(--ease-out-quint); }
+.animate-sheet-in { animation: sheet-in 280ms var(--ease-out-quint); }
+.animate-damage { animation: pulse-damage 600ms ease-out; }
+.animate-heal { animation: pulse-heal 600ms ease-out; }
+.animate-tumble { animation: die-tumble 560ms var(--ease-out-quint); }
+.animate-ember { animation: ember-glow 2.8s ease-in-out infinite; }
+
+/* ── Taku ─────────────────────────────────────────────────────────────────────
+ *
+ * El dibujo de Taku es uno y no se retoca. Lo que parece expresión es el
+ * movimiento del conjunto, y por eso todo acá son transformaciones del sprite
+ * entero: nada recorta, nada reemplaza la imagen.
+ *
+ * `transform-origin` abajo en todas: un personaje con botas pivota desde el
+ * suelo. Rotar desde el centro lo hace flotar y se nota enseguida.
+ *
+ * La regla global de `prefers-reduced-motion` las apaga todas, y Taku se queda
+ * quieto sin perder nada: lo que comunica está en la burbuja, no en el salto.
+ */
+
+@keyframes taku-idle {
+  0%, 100% { transform: translateY(0) scale(1); }
+  50% { transform: translateY(-2px) scale(1.012); }
+}
+
+/* Saludo: se inclina hacia la mano que ya está levantada en el dibujo. */
+@keyframes taku-greet {
+  0%, 100% { transform: rotate(0deg) translateY(0); }
+  25% { transform: rotate(-4.5deg) translateY(-3px); }
+  60% { transform: rotate(2.5deg) translateY(-1px); }
+}
+
+/* Festejo: dos saltitos. El segundo más bajo, como cualquier cosa con peso. */
+@keyframes taku-celebrate {
+  0%, 100% { transform: translateY(0) scale(1); }
+  20% { transform: translateY(-11px) scale(1.05); }
+  40% { transform: translateY(0) scale(0.97); }
+  58% { transform: translateY(-5px) scale(1.02); }
+  75% { transform: translateY(0) scale(0.99); }
+}
+
+/* Preocupación: se encoge y se queda quieto. Sin temblores: el momento en que
+ * alguien cae a 0 no es para hacer gracias. */
+@keyframes taku-worry {
+  0%, 100% { transform: translateY(1px) scale(0.975) rotate(-1.5deg); }
+  50% { transform: translateY(2px) scale(0.968) rotate(-1.5deg); }
+}
+
+@keyframes taku-think {
+  0%, 100% { transform: rotate(-2deg) translateY(0); }
+  50% { transform: rotate(1.5deg) translateY(-1.5px); }
+}
+
+/*
+ * Sin : mantiene una capa de composición viva para siempre, y
+ * medido en el build de producción con la CPU a un cuarto costaba más que el
+ * movimiento que pretendía acelerar.
+ */
+.animate-taku-idle,
+.animate-taku-greet,
+.animate-taku-celebrate,
+.animate-taku-worry,
+.animate-taku-think {
+  transform-origin: 50% 92%;
+}
+
+.animate-taku-idle { animation: taku-idle 4.2s ease-in-out infinite; }
+.animate-taku-greet { animation: taku-greet 1.5s var(--ease-out-quint) 2; }
+.animate-taku-celebrate { animation: taku-celebrate 900ms var(--ease-out-quint) 2; }
+.animate-taku-worry { animation: taku-worry 3s ease-in-out infinite; }
+.animate-taku-think { animation: taku-think 3.4s ease-in-out infinite; }
+
+/* Asomarse: sube desde detrás de la tarjeta una sola vez, y se queda. */
+@keyframes taku-peek {
+  from { transform: translateY(44%) rotate(-6deg); opacity: 0; }
+  to { transform: translateY(0) rotate(0deg); opacity: 1; }
+}
+
+.animate-taku-peek {
+  transform-origin: 50% 100%;
+  animation: taku-peek 620ms var(--ease-out-quint) both;
+}
+
+/* Escritorio: sin barra inferior, no hay hueco que reservar. */
+@media (min-width: 1024px) {
+  :root {
+    --nav-offset: 0px;
+  }
+}
