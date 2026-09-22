@@ -23,7 +23,7 @@ tiene tests y no rompe lo anterior.
 **Verificación actual del repositorio:**
 
 ```
-npm run verify      → typecheck ✓ · lint ✓ (0 errores) · 301 tests ✓ · 48 casos de BD ✓
+npm run verify      → typecheck ✓ · lint ✓ (0 errores) · 303 tests ✓ · 48 casos de BD ✓
 npm run build       → 27 rutas + middleware, compila ✓
 npx playwright test → 138 tests E2E ✓ (69 móvil + 69 escritorio) — contra el BUILD, ver abajo
 npm run test:db     → Postgres en proceso (rápido, sin red)
@@ -433,6 +433,37 @@ como «no la tiene» cuando falta.
 
 ---
 
+### ✅ FASE 18 — Taku recuerda lo que ya explicó
+
+**Objetivo.** Que un consejo se muestre una sola vez **de verdad**, y que los
+que hay digan algo que la pantalla no dice.
+
+**Archivos.** `src/ui/features/taku/TakuProvider.tsx` · `cues.ts` ·
+`lines.ts` · `src/app/(app)/profile/page.tsx` ·
+`src/ui/features/play/HitDicePanel.tsx` · `HeroicInspiration.tsx` ·
+`src/app/(app)/homebrew/page.tsx` ·
+`src/app/(app)/characters/[id]/manage/page.tsx` · `manage/equipment/page.tsx`
+
+**Cambios de base de datos.** Ninguno. Los ids vistos van a `localStorage`:
+son una preferencia del aparato, no del personaje, y no tienen por qué viajar.
+
+**Tests.** `tests/unit/taku.test.ts` (+2) · `tests/e2e/taku.spec.ts` (+1, y
+uno reescrito).
+
+**Aceptación.**
+- [x] Un consejo visto no vuelve **ni recargando la aplicación**
+- [x] Lo visto se lee en la inicialización, no en un efecto: los efectos de los
+      hijos corren ANTES que los del padre, así que un efecto llegaría cuando
+      la pantalla ya ofreció su consejo
+- [x] «Volver a ver los consejos» los devuelve, y **no** permite hablar antes
+      de que pase el tiempo de gracia
+- [x] Los cinco consejos nuevos saltan cuando la regla empieza a importar, no
+      al entrar a la pantalla
+- [x] Cada consejo cuenta una regla comprobada en el código; se descartaron dos
+      que ya estaban escritas en pantalla. Detalle en ADENDA XII
+
+---
+
 ## Deuda técnica conocida
 
 | # | Asunto | Impacto | Cuándo |
@@ -467,7 +498,7 @@ como «no la tiene» cuando falta.
 | Archivos TypeScript | 129 |
 | Líneas en `src/` | 27.225 |
 | Archivos de test | 24 (15 unitarios + 9 E2E) |
-| Tests unitarios + integración | **301** |
+| Tests unitarios + integración | **303** |
 | Tests E2E | **138** (69 móvil + 69 escritorio) |
 | Definiciones de contenido | 3.039 |
 | Traducción de contenido | 2.241 nombres + **2.127 textos** — el 100% del SRD, prosa, bloques de estadísticas y materiales incluidos—, 261.455 palabras |

@@ -128,7 +128,7 @@ test.describe('Taku', () => {
     await page.getByRole('checkbox', { name: /Taku comenta la partida/ }).check();
   });
 
-  test('el mismo consejo no se repite al volver a la pantalla', async ({ page }) => {
+  test('un consejo visto no vuelve, ni recargando la aplicación', async ({ page }) => {
     await page.goto('/library');
     await waitForContent(page);
 
@@ -136,14 +136,46 @@ test.describe('Taku', () => {
     await expect(tip).toBeVisible({ timeout: 15_000 });
     await page.getByRole('button', { name: 'Cerrar el mensaje de Taku' }).click();
 
-    // Ir y volver dentro de la misma sesión no lo trae de vuelta: un consejo
-    // que se repite deja de ser un consejo.
+    // Lo visto se guarda en el navegador, no solo en memoria: si viviera en
+    // memoria, mañana Taku volvería a explicar lo mismo.
+    const guardado = await page.evaluate(() => localStorage.getItem('taku-vistos'));
+    expect(guardado).toContain('library.first');
+
     await page.goto('/homebrew');
     await waitForContent(page);
     await page.goto('/library');
     await waitForContent(page);
-    await page.waitForTimeout(1500);
 
-    await expect(tip).toHaveCount(0);
+    /*
+      Se vigila durante OCHO segundos, más que los siete que dura la burbuja.
+
+      La versión anterior de este test esperaba 1,5 s y comprobaba una vez, y
+      pasaba sin que la persistencia existiera: se midió que la burbuja
+      aparecía a los 70 ms y se iba a los 7 s, así que aquella comprobación
+      llegaba cuando ya se había ido. Pasaba porque la burbuja había venido Y
+      SE HABÍA IDO, no porque no viniera.
+    */
+    for (let i = 0; i < 16; i += 1) {
+      await expect(tip).toHaveCount(0);
+      await page.waitForTimeout(500);
+    }
+  });
+
+  test('«volver a ver los consejos» los devuelve', async ({ page }) => {
+    await page.goto('/library');
+    await waitForContent(page);
+
+    const tip = page.getByRole('status').filter({ hasText: /en español o en inglés/ });
+    await expect(tip).toBeVisible({ timeout: 15_000 });
+    await page.getByRole('button', { name: 'Cerrar el mensaje de Taku' }).click();
+
+    // Sin esta salida, un consejo que apareció mientras mirabas para otro lado
+    // se perdería para siempre.
+    await page.goto('/profile');
+    await page.getByRole('button', { name: /Volver a ver los consejos/ }).click();
+
+    await page.goto('/library');
+    await waitForContent(page);
+    await expect(tip).toBeVisible({ timeout: 15_000 });
   });
 });

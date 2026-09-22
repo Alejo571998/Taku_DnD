@@ -126,6 +126,16 @@ export function dismissCue(state: TakuState, now: number): TakuState {
 }
 
 /**
+ * Vuelve a empezar: todos los consejos quedan por ver.
+ *
+ * `lastAt` NO se toca. Olvidar lo visto no es una excusa para hablar ahora
+ * mismo: si Taku acaba de decir algo, el tiempo de gracia sigue corriendo.
+ */
+export function forgetTips(state: TakuState): TakuState {
+  return { ...state, spent: new Set() };
+}
+
+/**
  * Reducer, para que la capa de React no necesite leer el estado anterior.
  *
  * Con `useState` había que guardar una copia en una ref para que la función de
@@ -136,7 +146,8 @@ export function dismissCue(state: TakuState, now: number): TakuState {
 export type TakuAction =
   | { readonly type: 'offer'; readonly cue: TakuCue; readonly now: number; readonly muted: boolean }
   | { readonly type: 'expire'; readonly now: number }
-  | { readonly type: 'dismiss'; readonly now: number };
+  | { readonly type: 'dismiss'; readonly now: number }
+  | { readonly type: 'forget' };
 
 export function takuReducer(state: TakuState, action: TakuAction): TakuState {
   switch (action.type) {
@@ -146,6 +157,8 @@ export function takuReducer(state: TakuState, action: TakuAction): TakuState {
       return expireCue(state, action.now);
     case 'dismiss':
       return dismissCue(state, action.now);
+    case 'forget':
+      return forgetTips(state);
   }
 }
 

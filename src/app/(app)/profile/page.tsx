@@ -5,7 +5,7 @@ import { Database, Info, Languages, Moon, Sun, Wifi } from 'lucide-react';
 import { cn } from '@ui/design-system/cn';
 import { Card, Chip, SectionTitle } from '@ui/design-system/primitives';
 import { Logo } from '@ui/design-system/Logo';
-import { useConnection, useTheme, type ThemePreference } from '@ui/components/AppProviders';
+import { useConnection, useTheme, useToast, type ThemePreference } from '@ui/components/AppProviders';
 import { useLocale } from '@ui/components/LocaleProvider';
 import { useSession } from '@ui/components/SessionProvider';
 import { LOCALE_LABELS, SUPPORTED_LOCALES } from '@/i18n/config';
@@ -15,11 +15,12 @@ import { AccountSection } from '@ui/features/auth/AccountSection';
 import { TranslationCoverageCard } from '@ui/features/library/TranslationCoverageCard';
 import { DiagnosticsSection } from '@ui/features/diagnostics/DiagnosticsSection';
 import { TakuSprite } from '@ui/features/taku/TakuSprite';
-import { useTaku } from '@ui/features/taku/TakuProvider';
+import { olvidarConsejosVistos, useTaku } from '@ui/features/taku/TakuProvider';
 
 export default function ProfilePage() {
   const { preference, setPreference } = useTheme();
   const { muted: takuMuted, setMuted: setTakuMuted } = useTaku();
+  const { notify } = useToast();
   const { locale, setLocale, t } = useLocale();
   const session = useSession();
   const syncing = session.isCloudEnabled && session.state.status === 'authenticated';
@@ -101,6 +102,24 @@ export default function ProfilePage() {
             className="size-5 shrink-0 accent-[var(--accent)]"
           />
         </label>
+
+        {/*
+          Los consejos ya no se repiten NUNCA, ni al día siguiente, así que
+          tiene que haber una forma de volver a verlos: si no, un consejo que
+          apareció mientras mirabas para otro lado se pierde para siempre.
+        */}
+        <button
+          onClick={() => {
+            olvidarConsejosVistos();
+            notify({ message: 'Taku va a volver a explicar lo básico', tone: 'neutral' });
+          }}
+          className="mt-2 w-full rounded-[var(--radius-lg)] border border-[var(--border-subtle)] bg-[var(--surface-raised)] p-3.5 text-left transition-colors hover:bg-[var(--surface-interactive)]"
+        >
+          <span className="block text-sm font-medium">Volver a ver los consejos</span>
+          <span className="block text-xs text-[var(--text-tertiary)]">
+            Cada consejo se muestra una sola vez. Esto los pone todos por ver otra vez.
+          </span>
+        </button>
       </section>
 
       <section>

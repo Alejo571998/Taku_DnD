@@ -219,8 +219,23 @@ test.describe('6 · Tirar un dado', () => {
 
 // ── Personaje de apoyo ───────────────────────────────────────────────────────
 
+/**
+ * El volcado del SRD arranca un instante después del primer pintado y el
+ * creador no sirve hasta que termina. Sin esto, el ayudante pulsaba a ciegas y
+ * aguantaba en una máquina descansada pero se caía con la suite entera en
+ * marcha: el presupuesto del volcado es de 150 segundos.
+ */
+async function esperarContenido(page: Page) {
+  const volcando = page.getByText('Preparando tu biblioteca');
+  await volcando.waitFor({ state: 'visible', timeout: 4000 }).catch(() => {
+    // Ya estaba volcado: no hay indicador que esperar.
+  });
+  await expect(volcando).toBeHidden({ timeout: 150_000 });
+}
+
 async function crearPersonaje(page: Page) {
   await page.goto('/characters/new');
+  await esperarContenido(page);
   const next = page.getByRole('button', { name: 'Siguiente' });
 
   /*

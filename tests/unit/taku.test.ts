@@ -3,6 +3,7 @@ import {
   COOLDOWN_MS,
   dismissCue,
   expireCue,
+  forgetTips,
   initialTakuState,
   moodOf,
   offerCue,
@@ -73,7 +74,7 @@ describe('Taku se calla', () => {
     }
   });
 
-  it('un consejo ya visto no vuelve en la misma sesión', () => {
+  it('un consejo ya visto no vuelve', () => {
     const first = offerCue(initialTakuState, tip('biblioteca'), 1000, loud);
     if (!first.accepted) throw new Error('debería haber entrado');
 
@@ -82,6 +83,45 @@ describe('Taku se calla', () => {
     expect(second.accepted).toBe(false);
     if (second.accepted) return;
     expect(second.reason).toBe('alreadySpent');
+  });
+
+  it('empezar con consejos ya vistos los da por vistos', () => {
+    /*
+      Es lo que hace la persistencia: `spent` se rellena desde el navegador
+      antes del primer renderizado. Si el motor no respetara un conjunto
+      inicial, guardar lo visto no serviría de nada.
+    */
+    const traido: TakuState = { ...initialTakuState, spent: new Set(['biblioteca']) };
+
+    const repetido = offerCue(traido, tip('biblioteca'), 1000, loud);
+    expect(repetido.accepted).toBe(false);
+    if (!repetido.accepted) expect(repetido.reason).toBe('alreadySpent');
+
+    // Y uno que no estaba en la lista sí entra.
+    expect(offerCue(traido, tip('nuevo'), 1000, loud).accepted).toBe(true);
+  });
+
+  it('olvidar lo visto los pone todos por ver, sin permitir hablar antes de tiempo', () => {
+    const visto = offerCue(initialTakuState, tip('biblioteca'), 1000, loud);
+    if (!visto.accepted) throw new Error('debería haber entrado');
+
+    // La burbuja ya se fue: si siguiera en pantalla el rechazo sería por
+    // prioridad y no se llegaría a mirar el tiempo de gracia, que es lo que
+    // este test quiere comprobar.
+    const olvidado = forgetTips(expireCue(visto.state, 6000));
+    expect(olvidado.spent.size).toBe(0);
+    expect(olvidado.current).toBeNull();
+
+    /*
+      `lastAt` NO se toca a propósito: pulsar «volver a ver los consejos» no es
+      una excusa para hablar encima de lo que Taku acaba de decir.
+    */
+    const enseguida = offerCue(olvidado, tip('biblioteca'), 7000, loud);
+    expect(enseguida.accepted).toBe(false);
+    if (!enseguida.accepted) expect(enseguida.reason).toBe('cooldown');
+
+    const pasadoElRato = offerCue(olvidado, tip('biblioteca'), 1000 + COOLDOWN_MS, loud);
+    expect(pasadoElRato.accepted).toBe(true);
   });
 
   it('respeta el tiempo de gracia entre intervenciones', () => {

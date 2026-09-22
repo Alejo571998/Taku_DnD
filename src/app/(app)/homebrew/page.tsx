@@ -307,6 +307,11 @@ const ISSUE_TEXT: Record<string, string> = {
  */
 function ImportSheet({ open, onClose }: { open: boolean; onClose: () => void }) {
   const { preview, commit } = useHomebrewActions();
+
+  // Al abrir el diálogo, no al entrar a Homebrew: es el momento en que alguien
+  // duda de si importar un archivo ajeno le va a pisar lo suyo.
+  useTakuCue(open, TIPS.homebrewImport);
+
   const [stage, setStage] = useState<ImportStage>({ kind: 'choose' });
   const [busy, setBusy] = useState(false);
   const fileInput = useRef<HTMLInputElement>(null);

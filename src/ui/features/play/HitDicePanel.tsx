@@ -4,6 +4,8 @@ import { Dices } from 'lucide-react';
 import type { CharacterSheet } from '@domain/character/sheet';
 import { cn } from '@ui/design-system/cn';
 import { PanelTitle } from '@ui/design-system/primitives';
+import { TIPS } from '@ui/features/taku/lines';
+import { useTakuCue } from '@ui/features/taku/TakuProvider';
 
 /**
  * DADOS DE GOLPE
@@ -18,6 +20,16 @@ import { PanelTitle } from '@ui/design-system/primitives';
  * consume, y duplicar la vía llevaría a dos contadores que se pisan.
  */
 export function HitDicePanel({ sheet }: { sheet: CharacterSheet }) {
+  /*
+    El consejo salta al gastar el PRIMER dado, no al abrir la ficha. Antes de
+    gastar ninguno, cuántos devuelve un descanso largo no le importa a nadie;
+    con el primero gastado empieza a importar, y es cuando se lee.
+  */
+  useTakuCue(
+    sheet.hitDice.some((bloque) => bloque.spent > 0),
+    TIPS.hitDiceRecovery,
+  );
+
   if (sheet.hitDice.length === 0) return null;
 
   return (

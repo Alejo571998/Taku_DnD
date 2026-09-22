@@ -2425,3 +2425,86 @@ hacerlo con la pantalla apagada.
 
 Lo mecánico ya no se repite a mano: `tests/e2e/lector-de-pantalla.spec.ts`, 18
 casos sobre las seis pruebas, en móvil y escritorio.
+
+---
+
+# ADENDA XII · TAKU RECUERDA LO QUE YA EXPLICÓ
+
+`cues.ts` prometía, en su propio comentario, que un consejo se muestra «una
+sola vez por sesión, o deja de ser ayuda y es insistencia». La regla era buena
+y estaba implementada. El problema era **por sesión**.
+
+## D-82 · Una promesa que duraba lo que la pestaña
+
+`spent` vivía en el estado de React y nada más. Cerrabas la aplicación y al día
+siguiente Taku volvía a explicar que se puede buscar en inglés. Explicar lo
+mismo dos veces es exactamente lo que convierte a un acompañante en un cartel
+que se aprende a ignorar, que es de lo que todo este módulo intenta escapar.
+
+Ahora la lista de ids vistos se guarda en el navegador. Se guardan **ids, no
+frases**: si mañana se reescribe un consejo sigue contando como visto, que es
+lo que se quiere. Para que vuelva a mostrarse hay que cambiarle el id, y eso
+es una decisión deliberada de alguien.
+
+### Se lee en la inicialización, no en un efecto
+
+Un efecto llegaría tarde, y de una forma que no se ve mirando el código: React
+corre los efectos de los HIJOS antes que los del padre. La pantalla ya habría
+ofrecido su consejo —y Taku lo habría repetido una vez más— antes de que el
+proveedor supiera que estaba visto.
+
+Leer `localStorage` durante el render no rompe la hidratación porque `spent` no
+se dibuja: en el servidor sale vacío, en el cliente sale lleno, y el HTML es
+idéntico. Lo único que cambia es si un consejo FUTURO se acepta.
+
+### Y hace falta una salida
+
+Como ya no se repiten NUNCA, un consejo que apareció mientras mirabas para otro
+lado se perdería para siempre. Por eso hay «Volver a ver los consejos» en el
+perfil, al lado del interruptor de silencio.
+
+Olvidar lo visto **no toca `lastAt`**: pulsar ese botón no es una excusa para
+hablar encima de lo que Taku acaba de decir.
+
+## D-83 · El tercer test de la sesión que pasaba sin mirar
+
+`taku.spec.ts` tenía un test llamado «el mismo consejo no se repite al volver a
+la pantalla». Pasaba. La persistencia no existía.
+
+Se midió: la burbuja aparece a los **70 ms** de cargar el contenido y dura
+**7 segundos**. El test esperaba 1,5 s después de `waitForContent` y comprobaba
+UNA vez. Para cuando comprobaba, la burbuja había venido y se había ido.
+
+Pasaba porque llegaba tarde, no porque la burbuja no viniera.
+
+Ahora vigila durante ocho segundos seguidos —más que los siete que dura— y
+además comprueba que el id quedó guardado en el navegador. Es el tercer caso de
+esta tanda: el `/0 resultados/` que casaba con «60 resultados», el borrado en
+cascada que se comprobaba sin esperarlo, y éste.
+
+## Los consejos nuevos, y los que se descartaron
+
+La regla de redacción ya estaba escrita: *«todos tienen que pasar la prueba de
+¿esto está escrito en la pantalla? Si la respuesta es sí, no va»*. Se escribió
+cada consejo después de comprobar **en el código** que la regla que cuenta
+existe en esta aplicación:
+
+| Consejo | Dónde salta | Comprobado en |
+| --- | --- | --- |
+| El descanso largo devuelve solo la mitad de los dados de golpe | Al gastar el primero | `engine.ts`: `max(1, floor(nivel / 2))` |
+| La inspiración heroica no se acumula | Al ganarla, en 2024 | `execute.ts`: volver a ganarla no cambia el estado |
+| Importar enseña qué entra antes de escribir | Al abrir el diálogo de importar | `service.ts`: `preview()` y `commit()` son dos pasos |
+| Cada arma de 2024 trae su maestría | Equipamiento, en 2024 | `schemas.ts`: el arma tiene `mastery` |
+| Ventaja y desventaja se anulan | Gestión, si el personaje tiene alguna | `computed.ts`: `resolveRollMode` |
+
+Se descartaron dos que sonaban bien:
+
+- **La sintonización topa en tres.** El aviso de la ficha ya dice «el máximo es
+  3», y las ranuras se pintan tres.
+- **La experiencia no bloquea.** La pantalla de subir de nivel ya dice «podés
+  subir igual si tu mesa juega por hitos».
+
+Ninguno salta al entrar a una pantalla «por si acaso»: todos esperan al momento
+en que la regla empieza a importarle a quien juega. El de los dados de golpe no
+dice nada hasta que gastás el primero; el de ventaja no aparece si tu personaje
+no tiene ninguna fuente de ventaja ni de desventaja.

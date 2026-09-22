@@ -95,6 +95,7 @@ desincronía.
 | **Cuenta** | Opcional. Sirve para una cosa: los mismos personajes en varios dispositivos |
 | **Sincronización** | Automática, con resolución de conflictos que el usuario decide |
 | **Idioma** | Interfaz en español y en inglés; el SRD entero traducido: 2.241 nombres y 2.127 textos, 261.455 palabras —prosa, bloques de estadísticas y materiales de conjuro—, con la cobertura a la vista |
+| **Taku** | Acompañante, no tutorial. Reacciona a lo que pasa en la mesa y explica una regla **cuando empieza a importar**, nunca al entrar a una pantalla. Cada consejo se muestra una sola vez y no vuelve ni recargando; se puede silenciar del todo, o volver a verlos desde el perfil |
 
 ### Lo que todavía NO hace
 

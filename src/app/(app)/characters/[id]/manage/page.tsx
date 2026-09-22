@@ -15,6 +15,8 @@ import { Card, Chip, EmptyState, LoadingState, ProgressBar, SectionTitle } from 
 import { CharacterHeader } from '@ui/components/CharacterHeader';
 import { HeaderBoxes, ProficienciesBlock } from '@ui/features/character/SheetBoxes';
 import { IdentityBlock } from '@ui/features/character/IdentityBlock';
+import { TIPS } from '@ui/features/taku/lines';
+import { useTakuCue } from '@ui/features/taku/TakuProvider';
 import { useCharacter, useCharacterSheet, useDispatch } from '@ui/hooks/useAppData';
 import { useCampaignOf } from '@ui/hooks/useCampaigns';
 
@@ -30,6 +32,24 @@ export default function ManageModePage({ params }: { params: Promise<{ id: strin
   const character = useCharacter(asCharacterId(id));
   const sheet = useCharacterSheet(character);
   const dispatch = useDispatch(character);
+
+  /*
+    Solo si este personaje tiene de dónde le venga una ventaja o una
+    desventaja. Al enano le sale la «Ventaja» en Constitución y la pregunta
+    aparece sola; a quien no tenga ninguna, contarle que se anulan entre sí es
+    resolverle una duda que no tiene.
+
+    Va antes de los retornos tempranos porque un hook no puede ir detrás de
+    uno; con la ficha a medio cargar la condición es falsa y no ofrece nada.
+  */
+  useTakuCue(
+    (sheet?.savingThrows
+      ? Object.values(sheet.savingThrows).some(
+          (save) => save.advantage.advantage.length > 0 || save.advantage.disadvantage.length > 0,
+        )
+      : false),
+    TIPS.advantageCancels,
+  );
 
   if (character === null) {
     return (

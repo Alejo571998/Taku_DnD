@@ -13,8 +13,16 @@ import { expect, test, type Page } from '@playwright/test';
  * MUESTRE, que es justo lo que faltaba.
  */
 
+/** Igual que en los demás specs: el creador no sirve hasta que el SRD está. */
+async function esperarContenido(page: Page) {
+  const volcando = page.getByText('Preparando tu biblioteca');
+  await volcando.waitFor({ state: 'visible', timeout: 4000 }).catch(() => {});
+  await expect(volcando).toBeHidden({ timeout: 150_000 });
+}
+
 async function crear2024(page: Page) {
   await page.goto('/characters/new');
+  await esperarContenido(page);
   const next = page.getByRole('button', { name: 'Siguiente' });
 
   /*

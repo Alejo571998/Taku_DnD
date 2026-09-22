@@ -8,6 +8,8 @@ import { asCharacterId } from '@domain/shared/ids';
 import { cn } from '@ui/design-system/cn';
 import { Card, Chip, LoadingState, SectionTitle } from '@ui/design-system/primitives';
 import { CharacterHeader } from '@ui/components/CharacterHeader';
+import { TIPS } from '@ui/features/taku/lines';
+import { useTakuCue } from '@ui/features/taku/TakuProvider';
 import { useCharacter, useCharacterSheet, useDefinitionName, useDispatch } from '@ui/hooks/useAppData';
 
 /**
@@ -39,6 +41,9 @@ export default function EquipmentPage({ params }: { params: Promise<{ id: string
   const dispatch = useDispatch(character);
   // Antes del return temprano: un hook no se puede llamar condicionalmente.
   const nombreDe = useDefinitionName(character?.ruleset ?? '2014');
+  // La maestría es solo de 2024: contarla en 5.1 sería prometer una regla que
+  // esa edición no trae.
+  useTakuCue(character?.ruleset === '2024', TIPS.weaponMastery);
 
   if (!character || !sheet) return <LoadingState label="Cargando…" />;
 

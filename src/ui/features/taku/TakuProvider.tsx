@@ -24,6 +24,61 @@ import { initialTakuState, moodOf, takuReducer, type TakuCue, type TakuMood } fr
 const MUTED_KEY = 'taku-muted';
 const MUTED_EVENT = 'taku:muted-change';
 
+/**
+ * LOS CONSEJOS YA VISTOS, QUE SOBREVIVEN A CERRAR LA APLICACIÓN.
+ *
+ * `spent` vivía solo en memoria, así que la promesa de «un consejo no se
+ * repite» duraba lo que durase la pestaña: al día siguiente Taku volvía a
+ * explicar lo mismo. Y explicar lo mismo dos veces es exactamente lo que
+ * convierte a un acompañante en un cartel que se aprende a ignorar.
+ *
+ * Se guarda una lista de ids, no las frases: si mañana se reescribe un
+ * consejo, sigue contando como visto, que es lo que se quiere. Para que
+ * vuelva a mostrarse hay que cambiarle el id, y eso es una decisión
+ * deliberada.
+ */
+const VISTOS_KEY = 'taku-vistos';
+const VISTOS_EVENT = 'taku:vistos-reset';
+
+/** Tope de seguridad: los ids son un conjunto cerrado y pequeño. */
+const MAX_VISTOS = 200;
+
+/*
+  Todo lo que toca `localStorage` va envuelto: en una ventana privada, con las
+  cookies bloqueadas o sin espacio, leer o escribir LANZA. Taku sin memoria es
+  un incordio menor; Taku que rompe la pantalla, no.
+*/
+function leerVistos(): ReadonlySet<string> {
+  if (typeof window === 'undefined') return new Set();
+  try {
+    const crudo = localStorage.getItem(VISTOS_KEY);
+    if (crudo === null) return new Set();
+    const lista: unknown = JSON.parse(crudo);
+    if (!Array.isArray(lista)) return new Set();
+    return new Set(lista.filter((x): x is string => typeof x === 'string').slice(0, MAX_VISTOS));
+  } catch {
+    return new Set();
+  }
+}
+
+function guardarVistos(vistos: ReadonlySet<string>): void {
+  try {
+    localStorage.setItem(VISTOS_KEY, JSON.stringify([...vistos].slice(-MAX_VISTOS)));
+  } catch {
+    // Sin sitio o sin permiso. Los consejos se repetirán, y ya está.
+  }
+}
+
+/** Vuelve a mostrar los consejos desde cero. */
+export function olvidarConsejosVistos(): void {
+  try {
+    localStorage.removeItem(VISTOS_KEY);
+  } catch {
+    // Igual que arriba.
+  }
+  window.dispatchEvent(new Event(VISTOS_EVENT));
+}
+
 function subscribeToMuted(onChange: () => void): () => void {
   window.addEventListener('storage', onChange);
   window.addEventListener(MUTED_EVENT, onChange);
@@ -67,7 +122,23 @@ const TakuPresenceContext = createContext<TakuPresence | null>(null);
 
 export function TakuProvider({ children }: { children: ReactNode }) {
   const muted = useSyncExternalStore(subscribeToMuted, readMuted, serverMuted);
-  const [state, dispatch] = useReducer(takuReducer, initialTakuState);
+
+  /*
+    Los consejos vistos se leen en la inicialización perezosa, no en un efecto.
+
+    Un efecto llegaría tarde: React corre los de los hijos ANTES que los del
+    padre, así que la pantalla ya habría ofrecido su consejo —y Taku lo habría
+    repetido una vez más— antes de que el proveedor supiera que estaba visto.
+
+    Leer `localStorage` durante el render no rompe la hidratación porque
+    `spent` no se dibuja: en el servidor sale vacío, en el cliente sale lleno,
+    y el HTML es idéntico en los dos casos. Lo único que cambia es si un
+    consejo FUTURO se acepta.
+  */
+  const [state, dispatch] = useReducer(takuReducer, undefined, () => ({
+    ...initialTakuState,
+    spent: leerVistos(),
+  }));
 
   const setMuted = useCallback((next: boolean) => {
     localStorage.setItem(MUTED_KEY, next ? '1' : '0');
@@ -88,6 +159,25 @@ export function TakuProvider({ children }: { children: ReactNode }) {
 
   const dismiss = useCallback(() => {
     dispatch({ type: 'dismiss', now: Date.now() });
+  }, []);
+
+  /*
+    Se guarda cuando cambia el conjunto, no en cada frase.
+
+    `spent` solo estrena identidad cuando se ACEPTA un consejo —el reductor
+    construye un `Set` nuevo únicamente ahí—, así que una reacción, una
+    expiración o cerrar la burbuja no escriben nada.
+  */
+  useEffect(() => {
+    guardarVistos(state.spent);
+  }, [state.spent]);
+
+  // «Volver a ver los consejos» puede pulsarse desde el panel de Taku, que no
+  // es hijo de este estado: el aviso llega por el mismo canal que el silencio.
+  useEffect(() => {
+    const olvidar = () => dispatch({ type: 'forget' });
+    window.addEventListener(VISTOS_EVENT, olvidar);
+    return () => window.removeEventListener(VISTOS_EVENT, olvidar);
   }, []);
 
   // Un temporizador por burbuja, no un intervalo permanente: Taku callado no

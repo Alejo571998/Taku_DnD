@@ -4,6 +4,8 @@ import { Sparkle } from 'lucide-react';
 import type { CharacterSheet } from '@domain/character/sheet';
 import { cn } from '@ui/design-system/cn';
 import { PanelTitle } from '@ui/design-system/primitives';
+import { TIPS } from '@ui/features/taku/lines';
+import { useTakuCue } from '@ui/features/taku/TakuProvider';
 import type { DispatchFn } from '@ui/hooks/useAppData';
 
 /**
@@ -24,9 +26,20 @@ export function HeroicInspiration({
   sheet: CharacterSheet;
   dispatch: DispatchFn;
 }) {
-  if (sheet.ruleset !== '2024') return null;
-
   const tiene = sheet.state.heroicInspiration === true;
+
+  /*
+    Al GANARLA, que es cuando la regla importa: si ya la tenés y el GM te da
+    otra, la segunda se pierde. Contarlo al abrir la ficha, con el recuadro
+    vacío, sería contar algo que todavía no le pasa a nadie.
+
+    El hook va antes del `return null` de 2014 porque los hooks no pueden ir
+    detrás de un retorno condicional. Da igual: en 2014 `tiene` es siempre
+    falso y no se ofrece nada.
+  */
+  useTakuCue(tiene && sheet.ruleset === '2024', TIPS.heroicInspiration);
+
+  if (sheet.ruleset !== '2024') return null;
   const estado = tiene ? 'La tenés: tocá para gastarla' : 'No la tenés: tocá si el GM te la da';
 
   /*
