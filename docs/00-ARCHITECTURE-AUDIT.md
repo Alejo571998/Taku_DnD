@@ -2508,3 +2508,100 @@ Ninguno salta al entrar a una pantalla «por si acaso»: todos esperan al moment
 en que la regla empieza a importarle a quien juega. El de los dados de golpe no
 dice nada hasta que gastás el primero; el de ventaja no aparece si tu personaje
 no tiene ninguna fuente de ventaja ni de desventaja.
+
+---
+
+# ADENDA XIII · EL PRIMER USUARIO REAL NO PODÍA ENTRAR
+
+Se desplegó, alguien creó una cuenta, y no pudo iniciar sesión. La pantalla
+decía **«Algo falló y no sabemos qué»**. Lo sabíamos.
+
+## D-84 · Un error descartado se disfraza de estado normal
+
+Iniciar sesión son dos pasos: Supabase valida la contraseña, y después la
+aplicación busca el espacio personal del usuario. El segundo pedía los datos
+ordenados por `joined_at`, y esa columna **no existe**: se llama `created_at`
+(migración 0001).
+
+PostgREST devolvía `column "joined_at" does not exist`. Y entonces:
+
+```ts
+const { data } = await client.from('workspace_members')...
+```
+
+**El error se descartaba.** `data` quedaba en `null`, y `null` significa otra
+cosa perfectamente legítima: «este usuario todavía no tiene espacio», que es un
+estado esperado justo después del alta. Un error de escritura se disfrazaba de
+estado normal, y por eso el diagnóstico que llegaba a la pantalla era ninguno.
+
+Se midió contra la base real con `scripts/diagnose-auth.mjs`: el disparador
+existía, el espacio existía, la membresía existía, cero usuarios huérfanos — y
+la consulta del navegador, ejecutada con RLS como ese usuario, lanzaba. Eso
+separó de un golpe «la fila no está» de «la fila está y no se puede leer», que
+desde fuera se ven idénticas.
+
+Ahora el error no se traga. Devolver `null` a secas convierte cualquier fallo
+futuro —una política nueva que cierre de más, otra columna mal escrita— en el
+mismo silencio.
+
+## D-85 · La costura que ninguna de las dos suites cubría
+
+Nada de lo que había podía encontrarlo, y no por descuido:
+
+| Lo que existía | Por qué no lo veía |
+| --- | --- |
+| 48 casos de base | Prueban las POLÍTICAS, en SQL. No ejecutan el TypeScript que arma la consulta |
+| 140 E2E | Nunca inician sesión: sin cuenta, ese camino no se recorre |
+| TypeScript | `order('joined_at')` es una cadena |
+
+Dos suites sanas, y entre ellas una costura por la que se cuela justo esto.
+
+`tests/unit/schema-contract.test.ts` la cose: lee las columnas de las
+migraciones, lee las que el código nombra en `select`, `eq` y `order`, y
+compara. Sin base de datos —son dos archivos de texto— y en 376 ms.
+
+Se comprobó que **falla** reintroduciendo el fallo original:
+
+```
+src/infrastructure/remote/auth.ts: workspace_members.joined_at (en .order())
+```
+
+Un test que solo se ha visto pasar no prueba nada. Éste lleva además dos casos
+que vigilan al propio analizador: si dejara de encontrar tablas o consultas,
+pasaría siempre y en silencio, que es peor que no tenerlo.
+
+## D-86 · «Algo falló y no sabemos qué» era mentira
+
+El mensaje genérico tapaba los dos pasos a la vez. Quien lo leía no podía
+saber si había escrito mal la contraseña, si le faltaba confirmar el correo o
+si el problema era nuestro — y lo único que podía hacer era repetir lo mismo.
+
+Ahora `auth.workspaceMissing` tiene código propio y dice lo que pasó: *«Tu
+contraseña es correcta, pero no pudimos abrir tu espacio. Es un problema
+nuestro, no tuyo»*. **De quién es el fallo es la información más útil del
+mensaje**: si es del usuario puede arreglarlo, si es nuestro repetir no sirve
+de nada.
+
+Se repasaron todos con la misma regla —qué pasó y qué hacer—, y el detalle
+técnico ahora **se ve** debajo del mensaje en lugar de quedarse en la consola.
+Nadie abre las herramientas de desarrollo para reportar un fallo.
+
+## D-87 · El logotipo medía cero de ancho
+
+Síntoma: del dragón solo se veían los ojos. Medido en producción: `width: 0px`
+computado en los tres logotipos de la pantalla de perfil.
+
+La marca va dentro de un `flex` junto a la palabra «TAKU D&D». Un SVG es un
+hijo flexible con `min-width: auto` resuelto a 0, así que cuando el sitio
+aprieta **se encoge hasta medir cero**: la altura queda correcta y el dragón
+sigue dibujado a 38px dentro de un lienzo de 0 de ancho, de modo que lo único
+que asoma es el detalle más brillante. Los ojos.
+
+Lo revelador es que el propio componente ya tenía un `silhouette` cuyo
+comentario describía este mismo síntoma —«solo se distinguían los ojos
+dorados… parecían dos puntos flotando»— y lo había resuelto con una silueta
+plana. Se trató el síntoma en un sitio sin encontrar la causa, que estaba en
+todos.
+
+`shrink-0` va en `DragonMark`, no en quien lo usa: un logotipo no se encoge
+nunca. Si no entra, lo que hay que arreglar es el sitio.

@@ -23,7 +23,7 @@ tiene tests y no rompe lo anterior.
 **Verificación actual del repositorio:**
 
 ```
-npm run verify      → typecheck ✓ · lint ✓ (0 errores) · 303 tests ✓ · 48 casos de BD ✓
+npm run verify      → typecheck ✓ · lint ✓ (0 errores) · 307 tests ✓ · 48 casos de BD ✓
 npm run build       → 27 rutas + middleware, compila ✓
 npx playwright test → 138 tests E2E ✓ (69 móvil + 69 escritorio) — contra el BUILD, ver abajo
 npm run test:db     → Postgres en proceso (rápido, sin red)
@@ -497,8 +497,8 @@ uno reescrito).
 |---|---|
 | Archivos TypeScript | 129 |
 | Líneas en `src/` | 27.225 |
-| Archivos de test | 24 (15 unitarios + 9 E2E) |
-| Tests unitarios + integración | **303** |
+| Archivos de test | 25 (16 unitarios + 9 E2E) |
+| Tests unitarios + integración | **307** |
 | Tests E2E | **138** (69 móvil + 69 escritorio) |
 | Definiciones de contenido | 3.039 |
 | Traducción de contenido | 2.241 nombres + **2.127 textos** — el 100% del SRD, prosa, bloques de estadísticas y materiales incluidos—, 261.455 palabras |

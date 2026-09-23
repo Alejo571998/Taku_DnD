@@ -118,7 +118,7 @@ try {
     [u.id],
   );
   const r = await client.query(
-    'select workspace_id from public.workspace_members where user_id = auth.uid() order by joined_at limit 1',
+    'select workspace_id from public.workspace_members where user_id = auth.uid() order by created_at limit 1',
   );
   console.log(
     '  filas devueltas                  ',
