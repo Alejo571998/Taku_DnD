@@ -74,17 +74,33 @@ export function AuthShell({
   );
 }
 
-/** Mensajes de error. La interfaz JAMÁS muestra un código crudo. */
+/**
+ * Mensajes de error. La interfaz JAMÁS muestra un código crudo.
+ *
+ * Cada uno dice DOS cosas: qué pasó y qué hacer. Un mensaje que solo dice que
+ * algo salió mal deja a quien lo lee sin salida —no sabe si escribió mal la
+ * contraseña, si le falta confirmar el correo o si el problema es nuestro— y
+ * lo único que puede hacer es repetir lo mismo a ver si cambia.
+ *
+ * El único que sigue siendo vago es `auth.unknown`, y ahí la honestidad es
+ * decir que el fallo es NUESTRO y no suyo: repetir el intento no lo va a
+ * arreglar. El detalle técnico va aparte, debajo, para poder copiarlo.
+ */
 export const AUTH_ERROR_TEXT: Record<AuthError['code'], string> = {
   'auth.invalidCredentials': 'El correo o la contraseña no coinciden.',
   'auth.emailInUse': 'Ya hay una cuenta con ese correo. Probá iniciar sesión.',
-  'auth.weakPassword': 'Esa contraseña es demasiado corta.',
+  'auth.weakPassword': 'Esa contraseña es demasiado corta: necesita 8 caracteres o más.',
   'auth.invalidEmail': 'Ese correo no parece válido.',
-  'auth.emailNotConfirmed': 'Te falta confirmar el correo. Revisá tu bandeja.',
-  'auth.rateLimited': 'Demasiados intentos seguidos. Esperá un minuto.',
-  'auth.notConfigured': 'Este servidor todavía no tiene la nube configurada.',
-  'auth.network': 'No pudimos conectarnos. Revisá tu conexión.',
-  'auth.unknown': 'Algo falló y no sabemos qué. Probá de nuevo.',
+  'auth.emailNotConfirmed':
+    'Te falta confirmar el correo. Buscá el mail que te mandamos y tocá el enlace; mirá también en el correo no deseado.',
+  'auth.rateLimited': 'Demasiados intentos seguidos. Esperá un minuto y volvé a probar.',
+  'auth.notConfigured':
+    'Esta copia de TAKU no tiene la nube configurada, así que todavía no se puede entrar con cuenta. Podés seguir jugando sin ella.',
+  'auth.network': 'No pudimos conectarnos. Revisá tu conexión y volvé a probar.',
+  'auth.workspaceMissing':
+    'Tu contraseña es correcta, pero no pudimos abrir tu espacio. Es un problema nuestro, no tuyo: volvé a intentar en un minuto y, si sigue, escribinos.',
+  'auth.unknown':
+    'No pudimos completar la operación, y el fallo es nuestro. Repetir el intento probablemente dé lo mismo.',
 };
 
 export const ISSUE_TEXT: Record<CredentialIssue, string> = {
@@ -137,15 +153,28 @@ export function Field({
   );
 }
 
-export function FormError({ message }: { message: string | null }) {
+export function FormError({ message, detail }: { message: string | null; detail?: string }) {
   if (!message) return null;
   return (
-    <p
+    <div
       role="alert"
       className="rounded-[var(--radius-md)] border border-[var(--danger-text)]/35 bg-[var(--danger-muted)] px-3.5 py-2.5 text-sm text-[var(--text-secondary)]"
     >
-      {message}
-    </p>
+      <p>{message}</p>
+      {/*
+        El detalle técnico se VE, no se esconde en la consola.
+
+        Nadie va a abrir las herramientas de desarrollo para contarnos qué le
+        pasó. Puesto acá, quien quiera reportarlo lo copia y pega; quien no,
+        lee la primera línea y ya está. Es texto del servidor de
+        autenticación, nunca la contraseña ni el token.
+      */}
+      {detail && (
+        <p className="mt-1.5 font-mono text-2xs leading-relaxed text-[var(--text-tertiary)]">
+          {detail}
+        </p>
+      )}
+    </div>
   );
 }
 

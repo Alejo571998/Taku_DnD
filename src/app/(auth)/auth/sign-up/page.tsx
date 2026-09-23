@@ -28,7 +28,7 @@ export default function SignUpPage() {
   const [password, setPassword] = useState('');
   const [confirm, setConfirm] = useState('');
   const [issues, setIssues] = useState<readonly CredentialIssue[]>([]);
-  const [error, setError] = useState<string | null>(null);
+  const [error, setError] = useState<{ text: string; detail?: string } | null>(null);
   const [busy, setBusy] = useState(false);
   const [checkEmail, setCheckEmail] = useState(false);
 
@@ -51,7 +51,7 @@ export default function SignUpPage() {
     setBusy(false);
 
     if (isErr(outcome)) {
-      setError(AUTH_ERROR_TEXT[outcome.error.code]);
+      setError({ text: AUTH_ERROR_TEXT[outcome.error.code], ...(outcome.error.detail ? { detail: outcome.error.detail } : {}) });
       return;
     }
 
@@ -98,7 +98,7 @@ export default function SignUpPage() {
         <CloudDisabledNotice />
       ) : (
         <form onSubmit={submit} className="space-y-4">
-          <FormError message={error} />
+          <FormError message={error?.text ?? null} detail={error?.detail} />
 
           {/*
             Quien ya jugó sin cuenta necesita saber que no va a perder nada.

@@ -40,6 +40,15 @@ export type AuthErrorCode =
   | 'auth.rateLimited'
   | 'auth.notConfigured'
   | 'auth.network'
+  /**
+   * La contraseña era correcta, pero no se pudo leer el espacio del usuario.
+   *
+   * Tiene código propio porque antes caía en `auth.unknown` y la pantalla
+   * decía «algo falló y no sabemos qué». Lo sabíamos perfectamente: entrar son
+   * DOS pasos —validar la contraseña y buscar el espacio— y quien lee el
+   * mensaje tiene que poder distinguir cuál de los dos se rompió.
+   */
+  | 'auth.workspaceMissing'
   | 'auth.unknown';
 
 export type AuthError = { readonly code: AuthErrorCode; readonly detail?: string };

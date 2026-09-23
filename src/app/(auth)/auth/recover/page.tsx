@@ -38,7 +38,7 @@ function RecoverContent() {
   const [password, setPassword] = useState('');
   const [confirm, setConfirm] = useState('');
   const [issues, setIssues] = useState<readonly CredentialIssue[]>([]);
-  const [error, setError] = useState<string | null>(null);
+  const [error, setError] = useState<{ text: string; detail?: string } | null>(null);
   const [busy, setBusy] = useState(false);
   const [sent, setSent] = useState(false);
 
@@ -67,7 +67,7 @@ function RecoverContent() {
     // Se confirma igual exista o no la cuenta: decir "ese correo no está
     // registrado" le regala a cualquiera una lista de usuarios.
     if (isErr(outcome) && outcome.error.code !== 'auth.unknown') {
-      setError(AUTH_ERROR_TEXT[outcome.error.code]);
+      setError({ text: AUTH_ERROR_TEXT[outcome.error.code], ...(outcome.error.detail ? { detail: outcome.error.detail } : {}) });
       return;
     }
     setSent(true);
@@ -88,7 +88,7 @@ function RecoverContent() {
     setBusy(false);
 
     if (isErr(outcome)) {
-      setError(AUTH_ERROR_TEXT[outcome.error.code]);
+      setError({ text: AUTH_ERROR_TEXT[outcome.error.code], ...(outcome.error.detail ? { detail: outcome.error.detail } : {}) });
       return;
     }
     router.push('/');
@@ -113,7 +113,7 @@ function RecoverContent() {
     return (
       <AuthShell title="Elegí una contraseña nueva" subtitle="Y volvés a tu mesa.">
         <form onSubmit={change} className="space-y-4">
-          <FormError message={error} />
+          <FormError message={error?.text ?? null} detail={error?.detail} />
           <Field
             id="password"
             label="Contraseña nueva"
@@ -151,7 +151,7 @@ function RecoverContent() {
       }
     >
       <form onSubmit={request} className="space-y-4">
-        <FormError message={error} />
+        <FormError message={error?.text ?? null} detail={error?.detail} />
         <Field
           id="email"
           label="Correo"

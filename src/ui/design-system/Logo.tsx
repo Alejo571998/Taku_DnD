@@ -23,7 +23,12 @@ export function DragonMark({
 }) {
   if (silhouette) {
     return (
-      <svg viewBox="0 0 48 48" fill="none" className={cn('size-8', className)} aria-hidden="true">
+      <svg
+        viewBox="0 0 48 48"
+        fill="none"
+        className={cn('size-8 shrink-0', className)}
+        aria-hidden="true"
+      >
         <path
           d="M24 4c-3.4 0-6.2 1.6-8.1 4.1-1.3-1.5-3-2.6-5-3.1.8 2.3.7 4.5-.2 6.4C8.2 13.6 6 17.4 6 21.8c0 3 1 5.6 2.7 7.6-1.5.6-2.8 1.7-3.7 3.1 2.2-.4 4.2-.1 5.9.8 1.3 3.6 4 6.5 7.5 8.1L18 44l6-2.2L30 44l-.4-2.6c3.5-1.6 6.2-4.5 7.5-8.1 1.7-.9 3.7-1.2 5.9-.8-.9-1.4-2.2-2.5-3.7-3.1 1.7-2 2.7-4.6 2.7-7.6 0-4.4-2.2-8.2-4.7-10.4.9-1.9.8-4.1-.2-6.4-2 .5-3.7 1.6-5 3.1C30.2 5.6 27.4 4 24 4Z"
           fill="currentColor"
@@ -36,7 +41,21 @@ export function DragonMark({
     <svg
       viewBox="0 0 48 48"
       fill="none"
-      className={cn('size-8', className)}
+      /*
+        `shrink-0` NO es decorativo: sin él el dragón desaparece.
+
+        La marca casi siempre va dentro de un `flex` al lado de la palabra
+        «TAKU D&D», que con ese interletrado ocupa bastante. Un SVG es un hijo
+        flexible con `min-width: auto` resuelto a 0, así que cuando el sitio
+        aprieta se encoge hasta MEDIR CERO DE ANCHO: la altura queda bien, el
+        dragón sigue dibujado a 38px dentro de un lienzo de 0, y lo único que
+        asoma son los ojos. Medido en producción: `width: 0px` computado en los
+        tres logos de la pantalla de perfil.
+
+        Va acá y no en quien lo usa porque un logotipo no se encoge nunca: si
+        no entra, lo que hay que arreglar es el sitio, no la marca.
+      */
+      className={cn('size-8 shrink-0', className)}
       role={title ? 'img' : 'presentation'}
       aria-label={title}
       aria-hidden={title ? undefined : true}

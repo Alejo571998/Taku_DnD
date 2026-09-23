@@ -88,13 +88,37 @@ export class SupabaseAuthGateway implements AuthGateway {
     const client = this.client();
     if (!client) return null;
 
-    const { data } = await client
+    /*
+      `created_at`, no `joined_at`.
+
+      Esta consulta ordenaba por una columna que NO EXISTE en la tabla —se
+      llama `created_at`, ver la migración 0001—. PostgREST devolvía el error
+      «column "joined_at" does not exist», el error se descartaba, `data`
+      quedaba en null, y el resultado era que alguien con su cuenta y su
+      workspace perfectamente creados no podía entrar. En pantalla: «algo
+      falló y no sabemos qué».
+
+      Nadie lo vio antes porque los tests de base prueban las POLÍTICAS en SQL
+      y los E2E nunca inician sesión.
+    */
+    const { data, error } = await client
       .from('workspace_members')
       .select('workspace_id')
       .eq('user_id', userId)
-      .order('joined_at', { ascending: true })
+      .order('created_at', { ascending: true })
       .limit(1)
       .maybeSingle();
+
+    /*
+      El error NO se descarta. Devolver `null` a secas convierte cualquier
+      fallo —una columna mal escrita, una política nueva que cierra de más— en
+      «todavía no hay workspace», que es un estado legítimo y esperado. Los dos
+      casos se ven igual desde fuera y el de verdad queda enterrado.
+    */
+    if (error) {
+      console.error('[auth] no se pudo leer el workspace del usuario:', error.message);
+      return null;
+    }
 
     const id = (data as { workspace_id?: string } | null)?.workspace_id;
     if (!id) return null;
@@ -156,7 +180,7 @@ export class SupabaseAuthGateway implements AuthGateway {
     if (error) return err(translate(error));
 
     const session = await this.toSession(data.session);
-    if (!session) return err({ code: 'auth.unknown', detail: 'sin workspace asignado' });
+    if (!session) return err({ code: 'auth.workspaceMissing' });
     return ok(session);
   }
 
