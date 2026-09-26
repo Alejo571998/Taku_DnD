@@ -150,7 +150,7 @@ export function Sidebar({ footer }: { footer?: React.ReactNode }) {
       )}
     >
       <div className="px-5 py-6">
-        <Link href="/" className="inline-flex" aria-label="TAKU D&D — Inicio">
+        <Link href="/" className="inline-flex min-h-11 items-center" aria-label="TAKU D&D — Inicio">
           <Logo size="md" />
         </Link>
       </div>
@@ -180,7 +180,12 @@ export function MobileHeader({ right }: { right?: React.ReactNode }) {
       className="sticky top-0 z-30 flex items-center justify-between gap-3 border-b border-[var(--border-subtle)] bg-[var(--surface-base)]/85 px-4 py-3 backdrop-blur-xl lg:hidden"
       style={{ paddingTop: 'calc(0.75rem + var(--safe-top))' }}
     >
-      <Link href="/" className="flex items-center gap-2" aria-label="TAKU D&D — Inicio">
+      {/* `min-h-11`: el logo mide 28px de alto y tambien es el enlace a Inicio. */}
+      <Link
+        href="/"
+        className="flex min-h-11 items-center gap-2"
+        aria-label="TAKU D&D — Inicio"
+      >
         <DragonMark className="size-7" />
         <span className="font-display text-base font-bold tracking-[0.16em]">TAKU</span>
         <span className="text-2xs font-semibold tracking-[0.28em] text-[var(--accent-text)]">D&amp;D</span>

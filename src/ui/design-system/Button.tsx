@@ -31,8 +31,19 @@ const VARIANTS: Record<ButtonVariant, string> = {
     'bg-[var(--arcane)] text-white font-semibold hover:brightness-110 active:brightness-95',
 };
 
+/**
+ * `sm` mide 44px en el teléfono y 36 a partir de tablet.
+ *
+ * 36px se lee bien con un ratón y se falla con el pulgar: la guía de Apple
+ * pide 44, y en esta aplicación el tamaño `sm` no es para cosas menores —lo
+ * llevan «Crear cuenta», «Nueva campaña», «Importar»—. Medido a 320-414px:
+ * respondían en 36 de alto.
+ *
+ * No se sube en todas partes porque en escritorio 44px para un botón
+ * secundario desequilibra la densidad, y ahí el puntero acierta igual.
+ */
 const SIZES: Record<ButtonSize, string> = {
-  sm: 'h-9 px-3 text-xs gap-1.5 rounded-[var(--radius-sm)]',
+  sm: 'h-11 sm:h-9 px-3.5 sm:px-3 text-xs gap-1.5 rounded-[var(--radius-sm)]',
   md: 'h-11 px-4 text-sm gap-2 rounded-[var(--radius-md)]',
   lg: 'h-13 px-6 text-base gap-2.5 rounded-[var(--radius-lg)]',
 };

@@ -136,7 +136,12 @@ function TakuBubble({ text, onDismiss }: { text: string; onDismiss: () => void }
         type="button"
         onClick={onDismiss}
         aria-label="Cerrar el mensaje de Taku"
-        className="pointer-events-auto -mr-1 -mt-0.5 shrink-0 rounded p-1 text-[var(--text-tertiary)] transition-colors hover:text-[var(--text-primary)]"
+        /*
+          El icono mide 14px y el area sensible medía 22x22. El pseudoelemento
+          la lleva a 38 sin agrandar la cruz ni descolocar la burbuja, que es
+          estrecha y no tiene sitio para un boton de 44.
+        */
+        className="pointer-events-auto relative -mr-1 -mt-0.5 shrink-0 rounded p-1 text-[var(--text-tertiary)] transition-colors before:absolute before:-inset-2 before:content-[''] hover:text-[var(--text-primary)]"
       >
         <X className="size-3.5" />
       </button>

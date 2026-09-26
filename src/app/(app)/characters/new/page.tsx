@@ -114,7 +114,7 @@ export default function CreateCharacterPage() {
           onClick={back}
           disabled={stepIndex === 0}
           aria-label="Paso anterior"
-          className="flex size-9 items-center justify-center rounded-[var(--radius-md)] text-[var(--text-tertiary)] transition-colors hover:bg-[var(--surface-interactive)] disabled:opacity-30"
+          className="flex size-11 items-center justify-center rounded-[var(--radius-md)] text-[var(--text-tertiary)] transition-colors hover:bg-[var(--surface-interactive)] disabled:opacity-30"
         >
           <ArrowLeft className="size-5" />
         </button>
@@ -122,7 +122,7 @@ export default function CreateCharacterPage() {
         <Link
           href="/characters"
           aria-label="Salir del creador"
-          className="flex size-9 items-center justify-center rounded-[var(--radius-md)] text-[var(--text-tertiary)] transition-colors hover:bg-[var(--surface-interactive)]"
+          className="flex size-11 items-center justify-center rounded-[var(--radius-md)] text-[var(--text-tertiary)] transition-colors hover:bg-[var(--surface-interactive)]"
         >
           <X className="size-5" />
         </Link>
@@ -254,7 +254,17 @@ function StepProgress({
             disabled={i > current}
             aria-label={`Ir a ${labels[s]}`}
             className={cn(
-              'h-1.5 flex-1 rounded-full transition-colors duration-200',
+              /*
+                La barra mide 6px de alto y se puede pulsar para volver a un
+                paso. Medido a 320px: 20×6. Eso no lo acierta un pulgar.
+
+                El pseudoelemento estira el área sensible 10px arriba y 10px
+                abajo —26px de alto, por encima del mínimo de 24 que pide WCAG
+                2.5.8— SIN cambiar el dibujo ni empujar nada: la barra sigue
+                viéndose de 6px y el resto de la pantalla no se mueve un pixel.
+              */
+              'relative h-1.5 flex-1 rounded-full transition-colors duration-200',
+              "before:absolute before:-inset-y-2.5 before:-inset-x-0.5 before:content-['']",
               i < current
                 ? 'bg-[var(--accent)]'
                 : i === current

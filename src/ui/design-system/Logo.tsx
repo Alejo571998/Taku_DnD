@@ -1,3 +1,6 @@
+'use client';
+
+import { useId } from 'react';
 import { cn } from './cn';
 
 /**
@@ -6,6 +9,8 @@ import { cn } from './cn';
  * El dragón es SVG propio, no una fuente de iconos: es la marca y tiene que
  * verse nítida a 24px en la barra y a 64px en la portada, y funcionar sin
  * conexión sin descargar nada.
+ *
+ * ES COMPONENTE DE CLIENTE por `useId`, y hace falta: ver el degradado.
  */
 export function DragonMark({
   className,
@@ -21,6 +26,25 @@ export function DragonMark({
    */
   silhouette?: boolean;
 }) {
+  /*
+    UN DEGRADADO POR INSTANCIA, CON SU PROPIO ID.
+
+    Antes los tres usaban `id="taku-scale"`. Tres elementos con el mismo id es
+    HTML inválido, y acá además rompía el dibujo: `url(#taku-scale)` resuelve
+    siempre al PRIMERO del documento, y el primero vive en la barra lateral de
+    escritorio, que en móvil está con `display:none`. Un degradado definido en
+    un subárbol oculto no pinta, así que el cuerpo del dragón salía vacío y lo
+    único que se veía eran los ojos —que no usan el degradado—.
+
+    En escritorio funcionaba de casualidad, porque ahí el primero sí se
+    dibujaba. Por eso el síntoma solo aparecía en el teléfono.
+
+    Se le quitan los dos puntos porque `useId` devuelve algo como `:r3:`, y
+    aunque un id con dos puntos es válido, un `#` con dos puntos es una mina
+    para cualquiera que luego lo busque con un selector CSS.
+  */
+  const gradiente = `taku-escama-${useId().replace(/:/g, '')}`;
+
   if (silhouette) {
     return (
       <svg
@@ -61,7 +85,7 @@ export function DragonMark({
       aria-hidden={title ? undefined : true}
     >
       <defs>
-        <linearGradient id="taku-scale" x1="10" y1="4" x2="38" y2="44" gradientUnits="userSpaceOnUse">
+        <linearGradient id={gradiente} x1="10" y1="4" x2="38" y2="44" gradientUnits="userSpaceOnUse">
           <stop stopColor="var(--color-crimson-300)" />
           <stop offset="0.55" stopColor="var(--color-crimson-500)" />
           <stop offset="1" stopColor="var(--color-crimson-700)" />
@@ -70,7 +94,7 @@ export function DragonMark({
       {/* Cabeza y cuello */}
       <path
         d="M24 4c-3.4 0-6.2 1.6-8.1 4.1-1.3-1.5-3-2.6-5-3.1.8 2.3.7 4.5-.2 6.4C8.2 13.6 6 17.4 6 21.8c0 3 1 5.6 2.7 7.6-1.5.6-2.8 1.7-3.7 3.1 2.2-.4 4.2-.1 5.9.8 1.3 3.6 4 6.5 7.5 8.1L18 44l6-2.2L30 44l-.4-2.6c3.5-1.6 6.2-4.5 7.5-8.1 1.7-.9 3.7-1.2 5.9-.8-.9-1.4-2.2-2.5-3.7-3.1 1.7-2 2.7-4.6 2.7-7.6 0-4.4-2.2-8.2-4.7-10.4.9-1.9.8-4.1-.2-6.4-2 .5-3.7 1.6-5 3.1C30.2 5.6 27.4 4 24 4Z"
-        fill="url(#taku-scale)"
+        fill={`url(#${gradiente})`}
       />
       {/* Ojos */}
       <circle cx="19" cy="20" r="2.1" fill="var(--surface-base)" />

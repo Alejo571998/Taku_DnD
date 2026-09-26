@@ -541,7 +541,9 @@ function ExportSection({ disabled }: { disabled: boolean }) {
                   onClick={() => setRuleset(r)}
                   aria-pressed={ruleset === r}
                   className={cn(
-                    'rounded-[var(--radius-sm)] px-3 py-1.5 text-xs font-medium transition-colors',
+                    // 44px de alto: es el minimo que la guia de Apple y WCAG 2.5.5 piden
+            // para algo que se toca con el pulgar. Medido antes: 30px.
+            'min-h-11 rounded-[var(--radius-sm)] px-3.5 text-xs font-medium transition-colors',
                     ruleset === r
                       ? 'bg-[var(--surface-interactive)] text-[var(--text-primary)]'
                       : 'text-[var(--text-tertiary)]',

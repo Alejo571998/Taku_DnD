@@ -99,7 +99,7 @@ export default function ProfilePage() {
             type="checkbox"
             checked={!takuMuted}
             onChange={(e) => setTakuMuted(!e.target.checked)}
-            className="size-5 shrink-0 accent-[var(--accent)]"
+            className="size-6 shrink-0 accent-[var(--accent)]"
           />
         </label>
 

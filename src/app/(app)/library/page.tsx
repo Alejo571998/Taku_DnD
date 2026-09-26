@@ -79,7 +79,9 @@ function LibraryContent() {
           <button
             onClick={() => setQuery('')}
             aria-label="Limpiar búsqueda"
-            className="absolute right-3 top-1/2 flex size-7 -translate-y-1/2 items-center justify-center rounded-full text-[var(--text-tertiary)] hover:bg-[var(--surface-interactive)]"
+            // El icono sigue midiendo 16px; lo que crece es el área que responde
+            // al dedo, de 28 a 44, sin mover nada de sitio.
+            className="absolute right-1.5 top-1/2 flex size-11 -translate-y-1/2 items-center justify-center rounded-full text-[var(--text-tertiary)] hover:bg-[var(--surface-interactive)]"
           >
             <X className="size-4" />
           </button>
@@ -93,7 +95,9 @@ function LibraryContent() {
             onClick={() => setFilter(f.key)}
             aria-pressed={filter === f.key}
             className={cn(
-              'shrink-0 rounded-full border px-3.5 py-1.5 text-xs font-medium transition-all',
+              // 44px de alto. Medido antes: 31px, y es la fila que más se toca de
+              // toda la pantalla.
+              'flex min-h-11 shrink-0 items-center rounded-full border px-4 text-xs font-medium transition-all',
               filter === f.key
                 ? 'border-transparent bg-crimson-gradient text-[var(--accent-on)] shadow-[var(--shadow-crimson)]'
                 : 'border-[var(--border-default)] text-[var(--text-secondary)] hover:border-[var(--border-strong)]',
@@ -212,7 +216,9 @@ function RulesetToggle({ value, onChange }: { value: Ruleset; onChange: (r: Rule
           onClick={() => onChange(r)}
           aria-pressed={value === r}
           className={cn(
-            'rounded-[var(--radius-sm)] px-3 py-1.5 text-xs font-medium transition-colors',
+            // 44px de alto: es el minimo que la guia de Apple y WCAG 2.5.5 piden
+            // para algo que se toca con el pulgar. Medido antes: 30px.
+            'min-h-11 rounded-[var(--radius-sm)] px-3.5 text-xs font-medium transition-colors',
             value === r
               ? 'bg-[var(--surface-interactive)] text-[var(--text-primary)]'
               : 'text-[var(--text-tertiary)]',

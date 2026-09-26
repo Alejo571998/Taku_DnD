@@ -2605,3 +2605,152 @@ todos.
 
 `shrink-0` va en `DragonMark`, no en quien lo usa: un logotipo no se encoge
 nunca. Si no entra, lo que hay que arreglar es el sitio.
+
+---
+
+# ADENDA XIV · EL LOGOTIPO Y EL REPASO DE RESPONSIVE
+
+## D-88 · El mismo `id` tres veces, y el dragón desaparecía solo en el teléfono
+
+Seguía viéndose roto en móvil después de arreglar `shrink-0`. El tamaño ya era
+correcto —28×28 y 36×36, medidos— y aun así solo asomaban los ojos.
+
+La causa estaba en una pista que se había anotado y dejado pasar: **tres
+elementos con `id="taku-scale"`**. `url(#taku-scale)` resuelve siempre al
+PRIMERO del documento, y el primero vive en la barra lateral de escritorio,
+que en móvil está con `display:none`. **Un degradado definido en un subárbol
+oculto no pinta.** El cuerpo del dragón salía vacío; los ojos se veían porque
+no usan el degradado.
+
+En escritorio funcionaba de casualidad: ahí el primero sí se dibuja. Por eso el
+síntoma era exclusivo del teléfono, que es la peor forma de tener un fallo.
+
+Ahora cada instancia genera su id con `useId`. El componente pasa a ser de
+cliente, que es el precio de la corrección y es barato.
+
+Lo que más enseña de este caso: el propio componente ya tenía un `silhouette`
+cuyo comentario describía este mismo síntoma —«solo se distinguían los ojos
+dorados… parecían dos puntos flotando»— y lo había resuelto tapándolo con una
+silueta plana. **Se trató el síntoma en un sitio sin buscar la causa, que
+estaba en todos.**
+
+## D-89 · Medir el área que responde al dedo, no la caja del elemento
+
+Se escribió una auditoría que recorre 10 pantallas × 5 anchos (320, 375, 414,
+768, 1280) buscando scroll horizontal, desbordes, áreas de toque pequeñas y
+texto cortado. Está en `scripts/audit-responsive.mjs` y se corre con
+`npm run audit:responsive`.
+
+La primera versión medía `getBoundingClientRect()` y **daba falsos positivos
+que parecían hallazgos**: marcaba como fallo una barra de 6px que acepta el
+toque en 26 gracias a un pseudoelemento estirado, que es justo la técnica para
+no deformar el diseño.
+
+Ahora sondea hacia fuera desde el centro con `elementFromPoint`, que es lo que
+hace el navegador cuando alguien toca. Y descarta lo que se recorta a
+propósito: `text-overflow: ellipsis` y `sr-only`. De los 43 avisos de «texto
+cortado» de la primera pasada, los 43 eran falsos.
+
+Un informe con ruido es peor que no tenerlo: entrena a ignorarlo.
+
+## D-90 · Lo que encontró, y lo que se decidió NO tocar
+
+| | Antes | Ahora |
+| --- | --- | --- |
+| Incumplimientos de WCAG 2.5.8 (< 24px) | 22 | **6**, todos exentos |
+| Scroll horizontal | 0 | 0 |
+
+Arreglado:
+
+- **Chips de filtro de la biblioteca**: 31px → 44. Es la fila que más se toca.
+- **Selector de edición 2014/2024**: 30px → 44, en biblioteca y en Homebrew.
+- **Limpiar la búsqueda**: 28 → 44, creciendo solo el área, no el icono.
+- **Cabecera del creador**: 36 → 44.
+- **Puntos de paso del creador**: 20×6 dibujados, **25×26 sensibles** con un
+  pseudoelemento. El dibujo no cambia y el resto de la pantalla no se mueve un
+  pixel.
+- **Botón `sm` del sistema de diseño**: 44px en el teléfono, 36 a partir de
+  tablet. No es un tamaño para cosas menores: lo llevan «Crear cuenta»,
+  «Nueva campaña», «Importar».
+- **Cerrar la burbuja de Taku**: 22 → 38. No llega a 44 porque la burbuja es
+  estrecha y no hay sitio; 38 está cómodamente sobre el mínimo AA.
+- **Casilla de Taku y enlaces del logotipo**: a 24 y 44.
+
+**No se tocó**, con motivo:
+
+- **Los seis enlaces que quedan por debajo de 24px** están DENTRO de una frase
+  —«¿Todavía no tenés cuenta? *Crear una*»—, y WCAG 2.5.8 exime justo ese caso:
+  agrandarlos rompería el renglón del párrafo. El que sí iba suelto y centrado,
+  «Olvidé mi contraseña», se agrandó.
+- **Los nueve «elementos que se salen»** son dos cosas legítimas: la fila de
+  chips es un carrusel horizontal a propósito (`overflow-x-auto` con
+  `-mx-4 px-4`, el patrón estándar en móvil), y el dragón decorativo de la
+  portada sangra por el borde a propósito. Ninguno provoca scroll de la página:
+  **cero casos de scroll horizontal en las 50 combinaciones**.
+
+---
+
+# ADENDA XV · LA TARJETA QUE SE VE AL COMPARTIR EL ENLACE
+
+Sin etiquetas Open Graph, LinkedIn muestra el enlace pelado: el dominio y poco
+más. Ahora muestra la imagen grande, el título y la bajada.
+
+## D-91 · Tres cosas que no son opcionales, aunque lo parezcan
+
+**La URL tiene que ser absoluta.** LinkedIn, WhatsApp y Slack descargan la
+imagen desde sus propios servidores; una ruta relativa no les dice nada. Next
+la construye a partir de `metadataBase`, y sin `metadataBase` emite rutas
+relativas y la tarjeta sale sin imagen.
+
+De dónde sale el dominio importa: de las variables que **Vercel pone sola**
+—`VERCEL_PROJECT_PRODUCTION_URL` primero, `VERCEL_URL` después—, no de una que
+haya que acordarse de configurar. Se quitó `NEXT_PUBLIC_APP_URL` en su momento
+justo por eso (ADENDA XIII) y habría sido incoherente traerla de vuelta. Se
+prefiere el dominio de producción sobre el del despliegue para que una vista
+previa compartida por error no reparta enlaces a una rama que mañana no existe.
+
+**`width` y `height` deciden el tamaño de la tarjeta.** LinkedIn elige entre la
+tarjeta grande y una miniatura al lado del texto, y lo decide ANTES de
+descargar la imagen. Si no sabe la proporción, tira por la miniatura.
+Declararlas es lo que dispara la tarjeta grande.
+
+**La imagen tiene que ser un archivo servido.** Un rastreador de enlaces no
+ejecuta JavaScript ni espera a que algo se construya. Por eso se genera una vez
+con `npm run build:og` y vive en el repositorio, en lugar de usar
+`opengraph-image.tsx` con `ImageResponse`: Satori no entiende todo el CSS y
+obliga a descargar la fuente en el build, más piezas para la misma imagen.
+
+## D-92 · Estaba en `public/`, y eso costaba medio mega a cada usuario
+
+La imagen entró primero en `public/og.png`, que es donde uno la pone sin
+pensar. El service worker precarga todo lo de `public/`, así que **cada persona
+que instalaba la aplicación se bajaba 505 KB, para siempre, de una imagen que
+solo mira el servidor de LinkedIn**.
+
+Se intentó excluirla por configuración, dos veces:
+
+| Intento | Resultado |
+| --- | --- |
+| `exclude: [/^og\.png$/]` | Sigue en el manifiesto. `exclude` filtra los recursos de webpack; lo de `public/` entra por otra puerta |
+| `globPublicPatterns: ['**/*', '!og.png']` | Sigue en el manifiesto |
+
+La solución no era una opción más: era **sacar el archivo de la carpeta**.
+Vive en `src/app/opengraph-image.png`, la convención de ficheros de Next, que
+además le lee las dimensiones al propio archivo y le cuelga un hash para que
+las redes no sirvan una versión vieja al cambiarla. Comprobado: **0
+ocurrencias** en `sw.js`, y los iconos siguen precargados.
+
+De paso desapareció la duplicación: Next genera también las etiquetas
+`twitter:image` desde ese mismo archivo, así que no hay que repetir medio mega
+en el repositorio para decir lo mismo.
+
+## Cómo comprobarlo cuando se despliegue
+
+LinkedIn **cachea la vista previa con agresividad**. Si se comparte el enlace
+antes de que las etiquetas existan, se queda con esa versión vacía durante
+días. Para forzarlo:
+
+> Post Inspector de LinkedIn — `linkedin.com/post-inspector`
+
+Se pega la URL y se pulsa «Inspect»: vuelve a leer las etiquetas y actualiza su
+copia. Conviene hacerlo la primera vez, y cada vez que cambie la imagen.

@@ -89,10 +89,16 @@ export default function SignInPage() {
             Entrar
           </Button>
 
+          {/*
+            Va SOLO, centrado bajo el formulario, así que no le vale la
+            excepción de WCAG 2.5.8 para enlaces dentro de una frase: eso es
+            para los que están rodeados de texto y no se pueden agrandar sin
+            deformar el párrafo. Éste sí puede, y medía 17px de alto.
+          */}
           <p className="text-center text-xs">
             <Link
               href="/auth/recover"
-              className="text-[var(--text-tertiary)] underline underline-offset-4 hover:text-[var(--text-secondary)]"
+              className="inline-flex min-h-11 items-center px-3 text-[var(--text-tertiary)] underline underline-offset-4 hover:text-[var(--text-secondary)]"
             >
               Olvidé mi contraseña
             </Link>

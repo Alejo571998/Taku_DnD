@@ -21,13 +21,43 @@ const inter = Inter({
   display: 'swap',
 });
 
+/**
+ * DÓNDE VIVE LA APLICACIÓN, PARA QUIEN LA COMPARTE.
+ *
+ * `og:image` TIENE que ser una URL absoluta: LinkedIn, WhatsApp y Slack
+ * descargan la imagen desde sus propios servidores y una ruta relativa no les
+ * dice nada. Next la construye a partir de `metadataBase`.
+ *
+ * Sale de las variables que Vercel pone sola, no de una que haya que acordarse
+ * de configurar —se quitó `NEXT_PUBLIC_APP_URL` justo por eso—:
+ *
+ *   VERCEL_PROJECT_PRODUCTION_URL  el dominio de producción, siempre el mismo
+ *   VERCEL_URL                     el de ESTE despliegue, distinto por rama
+ *
+ * Se prefiere el de producción para que una vista previa compartida por error
+ * no reparta enlaces a un despliegue de rama que mañana no existe. En local no
+ * hay ninguna de las dos y queda `localhost`, que es lo correcto: así se ve en
+ * el HTML que las etiquetas están, aunque el enlace no sirva fuera.
+ */
+const SITIO = new URL(
+  process.env.VERCEL_PROJECT_PRODUCTION_URL
+    ? `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}`
+    : process.env.VERCEL_URL
+      ? `https://${process.env.VERCEL_URL}`
+      : 'http://localhost:3000',
+);
+
+const TITULO = 'TAKU D&D — Tu compañero de aventura';
+const DESCRIPCION =
+  'Creá, gestioná y jugá tus personajes de Dungeons & Dragons. Reglas 2014 y 2024, inventario, hechizos y dados. Funciona sin conexión.';
+
 export const metadata: Metadata = {
+  metadataBase: SITIO,
   title: {
-    default: 'TAKU D&D — Tu compañero de aventura',
+    default: TITULO,
     template: '%s · TAKU D&D',
   },
-  description:
-    'Creá, gestioná y jugá tus personajes de Dungeons & Dragons. Reglas 2014 y 2024, inventario, hechizos y dados. Funciona sin conexión.',
+  description: DESCRIPCION,
   applicationName: 'TAKU D&D',
   manifest: '/manifest.webmanifest',
   appleWebApp: {
@@ -56,6 +86,55 @@ export const metadata: Metadata = {
     ],
     shortcut: [{ url: '/favicon.ico', sizes: '16x16 32x32 48x48' }],
     apple: [{ url: '/icons/apple-touch-icon.png', sizes: '180x180' }],
+  },
+
+  /**
+   * LA TARJETA QUE SE VE AL PEGAR EL ENLACE
+   *
+   * Sin esto, LinkedIn muestra el enlace pelado: el dominio y poco más. Con
+   * esto muestra la imagen grande, el título y la bajada.
+   *
+   * `width` y `height` no son opcionales en la práctica. LinkedIn decide entre
+   * la tarjeta grande y una miniatura al lado del texto, y si no sabe la
+   * proporción ANTES de descargar la imagen, tira por la miniatura. Declararlas
+   * es lo que dispara la tarjeta grande.
+   *
+   * 1200×630 es la proporción 1.91:1 que esperan todos.
+   *
+   * LA IMAGEN NO SE DECLARA ACÁ. Vive en `src/app/opengraph-image.png` y Next
+   * la encuentra por convención: le lee las dimensiones del propio archivo,
+   * emite las etiquetas y le cuelga un hash para que las redes no sirvan una
+   * versión vieja al cambiarla. El texto alternativo va en el `.alt.txt` de al
+   * lado, y lo usan los lectores de pantalla de las propias redes.
+   *
+   * Está FUERA de `public/` a propósito, y no es un detalle de organización:
+   * en `public/` la precargaba el service worker, medio mega que cada persona
+   * se bajaba al instalar para ver una imagen que solo mira el servidor de
+   * LinkedIn. Se intentó excluirla con `exclude` y con `globPublicPatterns`, y
+   * seguía entrando en el manifiesto; sacarla de la carpeta lo resuelve de
+   * raíz. Comprobado: 0 ocurrencias en `sw.js`.
+   */
+  openGraph: {
+    type: 'website',
+    siteName: 'TAKU D&D',
+    locale: 'es_AR',
+    url: SITIO,
+    title: TITULO,
+    description: DESCRIPCION,
+  },
+
+  /*
+    X y todo lo que lee las etiquetas `twitter:`, que son unas cuantas.
+
+    Sin `summary_large_image` sale la miniatura chica aunque la imagen sea
+    ancha. No se repite la imagen: cuando falta `twitter:image`, X usa la de
+    Open Graph, y duplicar medio mega en el repositorio para decir lo mismo no
+    tiene sentido.
+  */
+  twitter: {
+    card: 'summary_large_image',
+    title: TITULO,
+    description: DESCRIPCION,
   },
 };
 
