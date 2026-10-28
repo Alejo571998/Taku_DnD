@@ -33,3 +33,6 @@ PDFs_Taku_DnD/
 # Sistema
 .DS_Store
 Thumbs.db
+
+# Capturas de otras apps (benchmark): solo en el disco de Alejo, nunca en el repositorio
+Capturas_privadas/
